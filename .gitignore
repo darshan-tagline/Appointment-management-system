@@ -1,0 +1,86 @@
+node_modules/
+\.DS_Store
+**/\.DS_Store
+**/.AppleDouble
+**/.localized/
+**/.git/
+**/.svn/
+**/.hg/
+**/CVS/
+**/_darcs/
+**/.bzr/
+**/.backups/
+**/.my_app/
+**/node_modules/
+**/bower_components/
+**/.tmp/
+**/temp/
+**/cache/
+**/logs/
+
+# macOS
+\.DS_Store
+**/\.DS_Store
+**/.localized/
+
+# Windows
+**/Thumbs.db**
+**/Thumbs.db**  
+
+# IntelliJ IDEA
+**/.idea/
+
+# Visual Studio Code
+**/.vscode/
+
+# Grunt
+**/.grunt/
+
+# Bower
+**/bower_components/
+
+# Node.js
+**/node_modules/
+
+# npm
+**/npm-debug.log**
+
+# yarn
+**/.pnp.***
+**/.yarn/
+
+# Editor files
+**/.editorconfig**
+**/.eslintrc.js**
+**/.prettierrc**
+
+# Testing
+**/coverage/**
+**/test/**
+**/tests/**
+
+# Deployment
+**/.env**
+**/.env.local**
+**/.env.development**
+**/.env.production**
+
+# Docker
+**/docker-compose.yml**
+**/docker-compose.override.yml**
+**/docker-compose.dev.yml**
+**/.dockerignore**
+
+# Miscellaneous
+**/*.log**
+**/*.pid**
+**/*.session**
+**/*.sqlite3**
+**/.local**
+**/temp**
+**/tmp**
+**/cache**
+
+# Specific files and directories
+**/secrets.json**
+**/config/db.js** 
