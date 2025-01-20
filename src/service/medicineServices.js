@@ -1,4 +1,4 @@
-const { Medicine } = require("../model/medicineModel");
+const Medicine  = require("../model/medicineModel");
 
 const findMedicineByName = async (name) => {
   return Medicine.findOne({ name });

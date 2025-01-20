@@ -1,5 +1,5 @@
-const { sendResponse } = require("../utils/responseUtils");
-const { medicineValidatorSchema } = require("../validators/medicineValidation");
+const  sendResponse  = require("../utils/responseUtils");
+const  medicineValidatorSchema  = require("../validators/medicineValidation");
 
 const validateMedicine = (req, res, next) => {
   const { error } = medicineValidatorSchema.validate(req.body);
@@ -10,4 +10,4 @@ const validateMedicine = (req, res, next) => {
   next();
 };
 
-module.exports = { validateMedicine };
+module.exports = validateMedicine ;

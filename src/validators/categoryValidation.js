@@ -25,4 +25,4 @@ const categoryValidatorSchema = Joi.object({
   }),
 });
 
-module.exports = { categoryValidatorSchema };
+module.exports =  categoryValidatorSchema ;

@@ -1,5 +1,5 @@
-const { sendResponse } = require("../utils/responseUtils");
-const { categoryValidatorSchema } = require("../validators/categoryValidation");
+const  sendResponse = require("../utils/responseUtils");
+const categoryValidatorSchema = require("../validators/categoryValidation");
 
 const validateCategory = (req, res, next) => {
   const { error } = categoryValidatorSchema.validate(req.body);
@@ -10,4 +10,4 @@ const validateCategory = (req, res, next) => {
   next();
 };
 
-module.exports = { validateCategory };
+module.exports =  validateCategory ;

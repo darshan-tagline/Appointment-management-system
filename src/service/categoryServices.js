@@ -1,4 +1,4 @@
-const { Category } = require("../model/categoryModel");
+const  Category  = require("../model/categoryModel");
 
 const findCategoryByName = async (name) => {
   return Category.findOne({ name });
@@ -10,21 +10,15 @@ const findAllcategories = async () => {
   return Category.find();
 };
 
-// const searchCategoriesByNameWithPagination = async (name, skip, limit) => {
-//   return Category.find({
-//     name: { $regex: name, $options: "i" },
-//   })
-//     .skip(skip) 
-//     .limit(limit); 
-// };
-
-const searchCategoriesByname = async (name) => {
+const searchCategoriesByname = async (name, skip, limit) => {
   return Category.find({
     name: {
       $regex: `^${name}`,
       $options: "i",
     },
-  });
+  })
+    .skip(skip)
+    .limit(limit);
 };
 const findCategoryById = async (id) => {
   return Category.findById(id);
@@ -47,7 +41,6 @@ module.exports = {
   addNewCategory,
   findAllcategories,
   searchCategoriesByname,
-  // searchCategoriesByNameWithPagination,
   findCategoryById,
   removeCategory,
   modifyCategory,
