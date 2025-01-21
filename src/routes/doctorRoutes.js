@@ -3,10 +3,11 @@ const {
   doctorLogin,
   viewAndUpdateAppointment,
 } = require("../controller/doctorController");
-const authenticateToken = require("../middleware/authMiddleware");
+const authorizeDoctor = require("../middleware/doctorMiddleware");
+
 const doctorRouter = express.Router();
 
 doctorRouter.post("/login", doctorLogin);
-doctorRouter.put("/appoinment",authenticateToken,viewAndUpdateAppointment);
+doctorRouter.put("/appoinment", authorizeDoctor, viewAndUpdateAppointment);
 
 module.exports = doctorRouter;

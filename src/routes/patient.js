@@ -5,19 +5,20 @@ const {
   createAppointment,
   getAppoinment,
 } = require("../controller/patientController");
-const { validatePatient } = require("../middleware/patientMiddleware");
-const validateApponiment = require("../middleware/apponimentMiddleware");
-const authenticateToken = require("../middleware/authMiddleware");
+
+const validate = require("../middleware/validateMiddleware");
+const patientValidator = require("../validators/patientValidation");
+const appointmentValidator = require("../validators/appoinmentValidation");
 const patientRouter = express.Router();
 
-patientRouter.post("/signup", validatePatient, patientSignUp);
+patientRouter.post("/signup", validate(patientValidator), patientSignUp);
 patientRouter.post("/login", paientLogin);
 patientRouter.post(
   "/appoinment",
-  validateApponiment,
-  authenticateToken,
+  validate(appointmentValidator),
+
   createAppointment
 );
-patientRouter.get("/appoinment", authenticateToken, getAppoinment);
+patientRouter.get("/appoinment", getAppoinment);
 
 module.exports = patientRouter;

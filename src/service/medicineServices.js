@@ -1,19 +1,19 @@
-const Medicine  = require("../model/medicineModel");
+const Medicine = require("../model/medicineModel");
 
-const findMedicineByName = async (name) => {
-  return Medicine.findOne({ name });
+const findMedicine = async (data) => {
+  return Medicine.findOne(data);
 };
 
-const addNewMedicine = async ({ name, price }) => {
-  return Medicine.create({ name, price });
+const addNewMedicine = async (data) => {
+  return Medicine.create(data);
 };
 
 const findAllMedicines = async () => {
   return Medicine.find();
 };
 
-const findMedicineById = async (id) => {
-  return Medicine.findById(id);
+const findMedicineById = async (data) => {
+  return Medicine.findById(data);
 };
 
 const removeMedicine = async (id) => {
@@ -29,21 +29,25 @@ const modifyMedicine = async (id, medicine) => {
   );
 };
 
-const searchMedicinesByname = async (name) => {
+const searchMedicines = async (data, skip, limit) => {
+  const isNumeric = !isNaN(data);
+
   return Medicine.find({
-    name: {
-      $regex: `^${name}`,
-      $options: "i",
-    },
-  });
+    $or: [
+      { name: { $regex: data, $options: "i" } },
+      ...(isNumeric ? [{ price: parseFloat(data) }] : []),
+    ],
+  })
+    .skip(skip)
+    .limit(limit);
 };
 
 module.exports = {
-  findMedicineByName,
+  findMedicine,
   addNewMedicine,
   findAllMedicines,
   findMedicineById,
   removeMedicine,
   modifyMedicine,
-  searchMedicinesByname,
+  searchMedicines,
 };

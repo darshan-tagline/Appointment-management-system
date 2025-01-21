@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
 const  Admin  = require("../model/adminModel");
 
-const findAdminByEmail = async (data) => {
+const findAdmin = async (data) => {
   return Admin.findOne(data);
 };
 
-module.exports =  findAdminByEmail ;
+module.exports =  findAdmin ;

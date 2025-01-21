@@ -1,7 +1,9 @@
-const  Doctor  = require("../model/doctorModel");
+const Doctor = require("../model/doctorModel");
 
-const findDoctorByEmail = async (email) => {
-  return Doctor.findOne({ email });
+const findDoctor = async (data) => {
+  console.log(data);
+
+  return Doctor.findOne(data);
 };
 
 const addDoctor = async (doctorData) => {
@@ -20,13 +22,15 @@ const removeDoctor = async (id) => {
   return Doctor.findByIdAndDelete(id);
 };
 
-const searchDoctorByName = async (name) => {
+const searchDoctor = async (data,skip,limit) => {
   return Doctor.find({
-    name: {
-      $regex: `^${name}`,
-      $options: "i",
-    },
-  });
+    $or: [
+      { name: { $regex: `^${data}`, $options: "i" } },
+      { email: { $regex: `^${data}`, $options: "i" } },
+    ],
+  })
+    .skip(skip)
+    .limit(limit);
 };
 
 const modifyDoctor = async (id, doctor) => {
@@ -39,11 +43,11 @@ const modifyDoctor = async (id, doctor) => {
 };
 
 module.exports = {
-  findDoctorByEmail,
+  findDoctor,
   addDoctor,
   findDoctorById,
   findAllDoctors,
   removeDoctor,
   modifyDoctor,
-  searchDoctorByName,
+  searchDoctor,
 };

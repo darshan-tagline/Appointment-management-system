@@ -1,4 +1,4 @@
-const { findDoctorByEmail } = require("../service/doctorServices");
+const { findDoctor } = require("../service/doctorServices");
 const sendResponse = require("../utils/responseUtils");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -12,7 +12,7 @@ const { addNewCase } = require("../service/caseServices");
 const doctorLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const doctor = await findDoctorByEmail(email);
+    const doctor = await findDoctor({ email });
     if (!doctor) {
       return sendResponse(res, 401, "Invalid email or password");
     }
@@ -68,4 +68,5 @@ const viewAndUpdateAppointment = async (req, res) => {
     return sendResponse(res, 500, "Server error");
   }
 };
+
 module.exports = { doctorLogin, viewAndUpdateAppointment };

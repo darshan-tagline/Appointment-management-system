@@ -1,13 +1,23 @@
-const  sendResponse  = require("../utils/responseUtils");
-const doctorValidation  = require("../validators/doctorValidation");
+const sendResponse = require("../utils/responseUtils");
+const { tokenVarification } = require("../utils/token");
+const { findDoctor } = require("../service/doctorServices");
 
-const validateDoctor = (req, res, next) => {
-  const { error } = doctorValidation.validate(req.body);
-
-  if (error) {
-    return sendResponse(res, 400, "validation failed", null, error.details);
+const authorizeDoctor = async (req, res, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return sendResponse(res, 403, "Access denied. No token provided.");
+    }
+    const { email } = tokenVarification(token);
+    const user = await findDoctor(email);
+    if (!user) {
+      return sendResponse(res, 404, "User not found.");
+    }
+    req.user = user;
+    next();
+  } catch (error) {
+    return sendResponse(res, 401, "Invalid or expired token");
   }
-  next();
 };
 
-module.exports =  validateDoctor ;
+module.exports = authorizeDoctor;
