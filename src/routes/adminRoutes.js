@@ -22,7 +22,7 @@ const validate = require("../middleware/validateMiddleware");
 const adminvalidatorSchema = require("../validators/adminValidation");
 const categoryValidatorSchema = require("../validators/categoryValidation");
 const medicineValidatorSchema = require("../validators/medicineValidation");
-const doctorValidation = require("../validators/doctorValidation");
+const doctorValidatorSchema = require("../validators/doctorValidation");
 
 const adminRouter = express.Router();
 
@@ -68,14 +68,14 @@ adminRouter.get("/medicine/search/:input", authorize, searchMedicine);
 adminRouter.post(
   "/doctor",
   authorize,
-  validate(doctorValidation),
+  validate(doctorValidatorSchema),
   createDoctor
 );
 adminRouter.get("/doctor", getAllDoctors);
 adminRouter.put(
   "/doctor/:id",
   authorize,
-  validate(doctorValidation),
+  validate(doctorValidatorSchema),
   updateDoctor
 );
 adminRouter.get("/doctor/search/:input", authorize, searchDoctors);

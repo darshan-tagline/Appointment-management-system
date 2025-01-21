@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const doctorValidation = Joi.object({
+const doctorValidatorSchema = Joi.object({
   name: Joi.string().min(3).required().messages({
     "string.base": "Name must be a string.",
     "string.min": "Name must be at least 3 characters long.",
@@ -30,4 +30,4 @@ const doctorValidation = Joi.object({
   }),
 });
 
-module.exports =  doctorValidation;
+module.exports =  doctorValidatorSchema;

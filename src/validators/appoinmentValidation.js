@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const appointmentValidator = Joi.object({
+const appointmentValidatorSchema = Joi.object({
   doctorId: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .required()
@@ -58,4 +58,4 @@ const appointmentValidator = Joi.object({
     }),
 });
 
-module.exports = appointmentValidator;
+module.exports = appointmentValidatorSchema;

@@ -3,13 +3,14 @@ const jwt = require("jsonwebtoken");
 const { tokenGeneration, tokenDecode } = require("../utils/token");
 const { addNewPatient, findPatient } = require("../service/patientServices");
 const {
-  findAlready,
   addNewAppoinment,
   findTimeSlot,
   findAppointmentByPatientId,
   findBooking,
 } = require("../service/appoinmentServices");
 const { passwordHash, passwordCompare } = require("../utils/passwordUtils");
+const { findDoctor } = require("../service/doctorServices");
+const { findCasesByPatient } = require("../service/caseServices");
 
 const patientSignUp = async (req, res) => {
   try {
@@ -69,6 +70,10 @@ const createAppointment = async (req, res) => {
       timeSlot,
       symptoms,
     };
+    const validDoctorId = await findDoctor({ _id: doctorId });
+    if (!validDoctorId) {
+      return sendResponse(res, 400, "Doctor not found");
+    }
     const already = await findBooking(checkBooking);
     if (already) {
       return sendResponse(res, 400, "Appointment already exists");
@@ -96,14 +101,12 @@ const createAppointment = async (req, res) => {
 
 const getAppoinment = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return sendResponse(res, 401, "Authorization token is missing");
-    }
-    const { data } = jwt.decode(token, process.env.JWT_SECRET);
-    console.log(data);
+    const patientId = req.user.id;
 
-    const appointments = await findAppointmentByPatientId(data);
+    const appointments = await findAppointmentByPatientId(patientId);
+    if (!appointments || appointments.length === 0) {
+      return sendResponse(res, 404, "No appointments found.");
+    }
     return sendResponse(
       res,
       200,
@@ -116,9 +119,24 @@ const getAppoinment = async (req, res) => {
   }
 };
 
+const viewCase = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const data = await findCasesByPatient({ patientId });
+    if (!data) {
+      return sendResponse(res, 404, "Case not found");
+    }
+    return sendResponse(res, 200, "Case fetched successfully", data);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
 module.exports = {
   paientLogin,
   patientSignUp,
   createAppointment,
   getAppoinment,
+  viewCase,
 };
