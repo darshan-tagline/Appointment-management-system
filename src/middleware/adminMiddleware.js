@@ -1,6 +1,6 @@
-const {sendResponse} = require("../utils/responseUtils");
+const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
-const { adminvalidatorSchema } = require("../validators/adminValidation");
+const adminvalidatorSchema = require("../validators/adminValidation");
 
 const validateAdmin = (req, res, next) => {
   const { error } = adminvalidatorSchema.validate(req.body);
@@ -11,21 +11,14 @@ const validateAdmin = (req, res, next) => {
   next();
 };
 
-const authenticateToken = (req, res, next) => {
-  const token = req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!token) {
-    return sendResponse(res, 403, "Access denied. No token provided.");
+const authorizeAdmin = (req, res, next) => {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (req.user.email !== adminEmail) {
+    return res
+      .status(403)
+      .json({ message: "Forbidden: You are not authorized as an admin." });
   }
-
-  try {
-    const decoded = tokenVarification(token);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return sendResponse(res, 401, "Invalid or expired token");
-  }
+  next();
 };
 
-
-module.exports = { validateAdmin, authenticateToken };
+module.exports = { validateAdmin, authorizeAdmin };

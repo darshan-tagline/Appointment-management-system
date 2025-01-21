@@ -12,4 +12,4 @@ const sendResponse = (res, statusCode, message, data = null, error = null) => {
   return res.status(statusCode).send(response);
 };
 
-module.exports = { sendResponse };
+module.exports = sendResponse;

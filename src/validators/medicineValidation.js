@@ -13,4 +13,4 @@ const medicineValidatorSchema = Joi.object({
   }),
 });
 
-module.exports = { medicineValidatorSchema };
+module.exports =  medicineValidatorSchema;

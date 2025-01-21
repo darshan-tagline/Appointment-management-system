@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-const { Admin } = require("../model/adminModel");
-const { findAdminByEmail } = require("../service/adminServices");
+const  Admin = require("../model/adminModel");
+const  findAdminByEmail  = require("../service/adminServices");
 
 const createAdmin = async () => {
   try {
@@ -36,4 +36,4 @@ const createAdmin = async () => {
   }
 };
 
-module.exports = { createAdmin };
+module.exports =  createAdmin ;

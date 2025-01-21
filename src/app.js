@@ -2,7 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const connectDB = require("../config/db");
-const { sendResponse } = require("./utils/responseUtils");
+const  sendResponse  = require("./utils/responseUtils");
 
 const router = require("./routes/router");
 const port = process.env.PORT || 3000;

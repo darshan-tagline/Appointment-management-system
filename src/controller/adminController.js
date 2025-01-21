@@ -1,5 +1,5 @@
-const { findAdminByEmail } = require("../service/adminServices");
-const { sendResponse } = require("../utils/responseUtils");
+const findAdminByEmail = require("../service/adminServices");
+const sendResponse = require("../utils/responseUtils");
 const bcrypt = require("bcrypt");
 const { tokenGeneration } = require("../utils/token");
 const {
@@ -25,13 +25,19 @@ const {
   addDoctor,
   findAllDoctors,
   findDoctorById,
+  modifyDoctor,
+  removeDoctor,
+  searchDoctorByName,
 } = require("../service/doctorServices");
-const { sendEmail } = require("../utils/sendMail");
+const sendEmail = require("../utils/sendMail");
+const { default: mongoose } = require("mongoose");
+const Doctor = require("../model/doctorModel");
+
 
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const admin = await findAdminByEmail(email);
+    const admin = await findAdminByEmail({email});
     if (!admin) {
       return sendResponse(res, 401, "Invalid email or password");
     }
@@ -39,7 +45,7 @@ const adminLogin = async (req, res) => {
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    const token = tokenGeneration(admin._id);
+    const token = tokenGeneration(process.env.ADMIN_ID);
     return sendResponse(res, 200, "Login successful", { token });
   } catch (error) {
     console.log("error", error);
@@ -61,25 +67,13 @@ const addCtegory = async (req, res) => {
     return sendResponse(res, 500, "Server error");
   }
 };
-const getCategouryById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const category = await findCategoryById(id);
-    if (!category) {
-      return sendResponse(res, 404, "Category not found");
-    }
-    return sendResponse(res, 200, "Category fetched successfully", category);
-  } catch (error) {
-    console.log("error", error);
-    return sendResponse(res, 500, "Server error");
-  }
-};
+
 const getAllCategories = async (req, res) => {
   try {
     const categories = await findAllcategories();
-    if (categories.length === 0) {
-      return sendResponse(res, 404, "Categories not found");
-    }
+    // if (categories.length === 0) {
+    //   return sendResponse(res, 404, "Categories not found");
+    // }
     return sendResponse(
       res,
       200,
@@ -93,19 +87,28 @@ const getAllCategories = async (req, res) => {
 };
 const searchCategories = async (req, res) => {
   try {
-    const { name } = req.params;
+    const { input } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    if (!name) {
-      const categories = await findAllcategories(skip, limit);
-      return sendResponse(res, 400, "All categories", categories);
+    let categories;
+
+    if (mongoose.Types.ObjectId.isValid(input)) {
+      const category = await findCategoryById(input);
+      if (category) {
+        categories = [category];
+      } else {
+        categories = [];
+      }
+    } else {
+      categories = await searchCategoriesByname(input, skip, limit);
     }
-    const categories = await searchCategoriesByname(name);
-    if (categories.length === 0) {
-      return sendResponse(res, 404, "Categories not found");
+
+    if (!categories || categories.length === 0) {
+      return sendResponse(res, 404, "No categories found");
     }
+
     return sendResponse(
       res,
       200,
@@ -113,10 +116,11 @@ const searchCategories = async (req, res) => {
       categories
     );
   } catch (error) {
-    console.log("error", error);
+    console.error("Error fetching categories:", error);
     return sendResponse(res, 500, "Server error");
   }
 };
+
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -189,20 +193,6 @@ const getAllMedicines = async (req, res) => {
   }
 };
 
-const getMedicineById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const medicine = await findMedicineById(id);
-    if (!medicine) {
-      return sendResponse(res, 404, "Medicine not found");
-    }
-    return sendResponse(res, 200, "Medicine fetched successfully", medicine);
-  } catch (error) {
-    console.log("error", error);
-    return sendResponse(res, 500, "Server error");
-  }
-};
-
 const updateMedicine = async (req, res) => {
   try {
     const { id } = req.params;
@@ -248,22 +238,31 @@ const deleteMedicine = async (req, res) => {
 
 const searchMedicine = async (req, res) => {
   try {
-    const { name } = req.params;
+    const { input } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    if (!name) {
-      const medicines = await findAllMedicines(skip, limit);
-      return sendResponse(res, 400, "All medicines", medicines);
+    let medicines;
+
+    if (mongoose.Types.ObjectId.isValid(input)) {
+      const medicine = await findMedicineById(input);
+      if (medicine) {
+        medicines = [medicine];
+      } else {
+        medicines = [];
+      }
+    } else {
+      medicines = await searchMedicinesByname(input, skip, limit);
     }
-    const medicines = await searchMedicinesByname(name);
-    if (medicines.length === 0) {
-      return sendResponse(res, 404, "Medicines not found");
+
+    if (!medicines || medicines.length === 0) {
+      return sendResponse(res, 404, "No medicines found");
     }
+
     return sendResponse(res, 200, "Medicines fetched successfully", medicines);
   } catch (error) {
-    console.log("error", error);
+    console.error("Error fetching medicines:", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -329,22 +328,24 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
-const getDoctorById = async (req, res) => {
+const updateDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const doctor = await findDoctorById(id);
+    const { name, email, category } = req.body;
+
+    const validCategory = await findCategoryById(category);
+    if (!validCategory) {
+      return sendResponse(res, 400, "Category not found");
+    }
+    const already = await findDoctorByEmail(email);
+    if (already) {
+      return sendResponse(res, 400, "Doctor already exists");
+    }
+    const doctor = await modifyDoctor(id, { name, email, category });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");
     }
-    return sendResponse(res, 200, "Doctor fetched successfully", doctor);
-  } catch (error) {
-    console.log("error", error);
-    return sendResponse(res, 500, "Server error");
-  }
-};
-
-const updateDoctor = async (req, res) => {
-  try {
+    return sendResponse(res, 200, "Doctor updated successfully", doctor);
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -353,6 +354,12 @@ const updateDoctor = async (req, res) => {
 
 const deleteDoctor = async (req, res) => {
   try {
+    const { id } = req.params;
+    const doctor = await removeDoctor(id);
+    if (!doctor) {
+      return sendResponse(res, 404, "Doctor not found");
+    }
+    return sendResponse(res, 200, "Doctor deleted successfully");
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -361,8 +368,34 @@ const deleteDoctor = async (req, res) => {
 
 const searchDoctors = async (req, res) => {
   try {
+    const { input } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    let doctors;
+
+    if (mongoose.Types.ObjectId.isValid(input)) {
+      const doctor = await findDoctorById(input);
+
+      if (doctor) {
+        doctors = [doctor];
+      } else {
+        doctors = [];
+      }
+    } else {
+      doctors = await Doctor.find({ name: new RegExp(input, "i") })
+        .skip(skip)
+        .limit(limit);
+    }
+
+    if (!doctors || doctors.length === 0) {
+      return sendResponse(res, 404, "No doctors found");
+    }
+
+    return sendResponse(res, 200, "Doctors fetched successfully", doctors);
   } catch (error) {
-    console.log("error", error);
+    console.error("Error fetching doctors:", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -370,23 +403,22 @@ const searchDoctors = async (req, res) => {
 module.exports = {
   adminLogin,
 
+  //category
   addCtegory,
   getAllCategories,
   searchCategories,
   deleteCategory,
   updateCategory,
-  getCategouryById,
 
+  //medicine
   addMedicine,
   getAllMedicines,
-  getMedicineById,
   updateMedicine,
   deleteMedicine,
   searchMedicine,
-
+  //doctor
   createDoctor,
   getAllDoctors,
-  getDoctorById,
   updateDoctor,
   deleteDoctor,
   searchDoctors,

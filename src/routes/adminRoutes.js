@@ -3,64 +3,131 @@ const {
   adminLogin,
   addCtegory,
   getAllCategories,
-  getCategouryById,
   deleteCategory,
   updateCategory,
   searchCategories,
   addMedicine,
   getAllMedicines,
-  getMedicineById,
   updateMedicine,
   deleteMedicine,
   searchMedicine,
   createDoctor,
   getAllDoctors,
-  getDoctorById,
+  updateDoctor,
+  deleteDoctor,
+  searchDoctors,
 } = require("../controller/adminController");
 const {
   validateAdmin,
-  authenticateToken,
+  authorizeAdmin,
 } = require("../middleware/adminMiddleware");
-const { validateCategory } = require("../middleware/categoryMiddleware");
-const { validateMedicine } = require("../middleware/medicineMiddleware");
-const { addDoctor } = require("../service/doctorServices");
-const { validateDoctor } = require("../middleware/doctorMiddleware");
-const { get } = require("mongoose");
+const validateCategory = require("../middleware/categoryMiddleware");
+const validateMedicine = require("../middleware/medicineMiddleware");
+const validateDoctor = require("../middleware/doctorMiddleware");
+const authenticateToken = require("../middleware/authMiddleware");
+const validatee = require("../middleware/validateMiddleware");
 
 const adminRouter = express.Router();
 
 //Login
-adminRouter.post("/login", validateAdmin, adminLogin);
+adminRouter.post("/login", validatee(validateAdmin), adminLogin);
 
 //Category
-adminRouter.post("/category", validateCategory, authenticateToken, addCtegory);
-adminRouter.get("/category", authenticateToken, getAllCategories);
-adminRouter.get("/category/:id", authenticateToken, getCategouryById);
+adminRouter.post(
+  "/category",
+  validateCategory,
+  authenticateToken,
+  authorizeAdmin,
+  addCtegory
+);
+adminRouter.get(
+  "/category",
+  authenticateToken,
+  authorizeAdmin,
+  getAllCategories
+);
 adminRouter.put(
   "/category/:id",
   validateCategory,
   authenticateToken,
+  authorizeAdmin,
   updateCategory
 );
-adminRouter.delete("/category/:id", authenticateToken, deleteCategory);
-adminRouter.get("/category/search/:name", authenticateToken, searchCategories);
+adminRouter.delete(
+  "/category/:id",
+  authenticateToken,
+  authorizeAdmin,
+  deleteCategory
+);
+adminRouter.get(
+  "/category/search/:input",
+  authenticateToken,
+  authorizeAdmin,
+  searchCategories
+);
 
 //Medicine
-adminRouter.post("/medicine", authenticateToken, validateMedicine, addMedicine);
-adminRouter.get("/medicine", authenticateToken, getAllMedicines);
-adminRouter.get("/medicine/:id", authenticateToken, getMedicineById);
+adminRouter.post(
+  "/medicine",
+  authenticateToken,
+  authorizeAdmin,
+  validateMedicine,
+  addMedicine
+);
+adminRouter.get(
+  "/medicine",
+  authenticateToken,
+  authorizeAdmin,
+  getAllMedicines
+);
 adminRouter.put(
   "/medicine/:id",
   validateMedicine,
   authenticateToken,
+  authorizeAdmin,
   updateMedicine
 );
-adminRouter.delete("/medicine/:id", authenticateToken, deleteMedicine);
-adminRouter.get("/medicine/search/:name", authenticateToken, searchMedicine);
+adminRouter.delete(
+  "/medicine/:id",
+  authenticateToken,
+  authorizeAdmin,
+  deleteMedicine
+);
+adminRouter.get(
+  "/medicine/search/:input",
+  authenticateToken,
+  authorizeAdmin,
+  searchMedicine
+);
 
 //Doctor
 
-adminRouter.post("/doctor", authenticateToken, validateDoctor, createDoctor);
-adminRouter.get("/doctor", authenticateToken, getAllDoctors);
-adminRouter.get("/doctor/:id", authenticateToken, getDoctorById);
-module.exports = { adminRouter };
+adminRouter.post(
+  "/doctor",
+  authenticateToken,
+  authorizeAdmin,
+  validateDoctor,
+  createDoctor
+);
+adminRouter.get("/doctor", authenticateToken, authorizeAdmin, getAllDoctors);
+adminRouter.put(
+  "/doctor/:id",
+  authenticateToken,
+  authorizeAdmin,
+  validateDoctor,
+  updateDoctor
+);
+adminRouter.delete(
+  "/doctor/:id",
+  authenticateToken,
+  authorizeAdmin,
+  deleteDoctor
+);
+adminRouter.get(
+  "/doctor/search/:input",
+  authenticateToken,
+  authorizeAdmin,
+  searchDoctors
+);
+
+module.exports = adminRouter;
