@@ -8,14 +8,15 @@ const {
 const {
   addNewCase,
   findCasesByDoctor,
-  updateCaseStatus,
 } = require("../service/caseServices");
 const { passwordCompare } = require("../utils/passwordUtils");
-const validate = require("../middleware/validateMiddleware");
 const {
-  findHearingByCaseId,
   addNewHearing,
+  findHearing,
+  updateHearingData,
 } = require("../service/hearingServices");
+const { default: mongoose } = require("mongoose");
+const { createBill } = require("../service/billServices");
 
 const doctorLogin = async (req, res) => {
   try {
@@ -108,18 +109,27 @@ const addHearing = async (req, res) => {
         "Prescription must contain at least one medicine."
       );
     }
-
-    const currentDate = new Date();
-
+    for (let i = 0; i < prescription.length; i++) {
+      const { medicineId, dosage, duration } = prescription[i];
+      if (!medicineId || !dosage || !duration) {
+        return sendResponse(
+          res,
+          400,
+          "Each medicine must have a valid medicineId, dosage, and duration."
+        );
+      }
+      if (mongoose.Types.ObjectId.isValid(medicineId)) {
+        prescription[i].medicineId = new mongoose.Types.ObjectId(medicineId);
+      } else {
+        return sendResponse(res, 400, "Invalid medicineId.");
+      }
+    }
     const newHearingData = {
       caseId,
-      date: currentDate,
       description,
       prescription,
     };
-    const existingCase = await findHearingByCaseId({ caseId });
-    console.log("existingCase", existingCase);
-    
+        const existingCase = await findHearing({ caseId });
     if (existingCase) {
       return sendResponse(
         res,
@@ -127,7 +137,7 @@ const addHearing = async (req, res) => {
         "Hearing for this case already exists in the database."
       );
     }
-
+    
     const newHearing = await addNewHearing(newHearingData);
 
     return sendResponse(res, 201, "Hearing added successfully", newHearing);
@@ -137,24 +147,59 @@ const addHearing = async (req, res) => {
   }
 };
 
+const getHearing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await findHearing({ _id: id });
+    if (!data) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+    return sendResponse(res, 200, "Hearing fetched successfully", data);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
 const updateHearing = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const hearing = await updateCaseStatus(id, status);
+    const hearing = await updateHearingData(id, status);
+
     if (!hearing) {
       return sendResponse(res, 404, "Hearing not found");
+    }
+
+    if (/^resolved$/i.test(status)) {
+      const caseId = hearing.caseId._id;
+      const totalAmount = calculateTotalAmount(hearing);
+
+      const bill = await createBill(caseId, hearing._id, totalAmount);
+
+      return sendResponse(res, 200, "Hearing updated and bill created", {
+        hearing,
+        bill,
+      });
     }
     return sendResponse(res, 200, "Hearing updated successfully", hearing);
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
   }
-}
+};
+
+const calculateTotalAmount = (hearing) => {
+  const medicineCount = hearing.prescription.length;
+  const ratePerMedicine = 50;
+  return medicineCount * ratePerMedicine;
+};
 module.exports = {
   doctorLogin,
   updateAppointment,
   getAppointmentForDoctor,
   getCase,
+  getHearing,
   addHearing,
+  updateHearing,
 };

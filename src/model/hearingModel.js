@@ -7,10 +7,6 @@ const hearingSchema = new mongoose.Schema(
       ref: "Case",
       required: true,
     },
-    date: {
-      type: Date,
-      required: true,
-    },
     description: {
       type: String,
       required: true,
@@ -22,9 +18,19 @@ const hearingSchema = new mongoose.Schema(
     },
     prescription: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Medicine", 
-        required: true,
+        medicineId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Medicine",
+          required: true,
+        },
+        dosage: {
+          type: String,
+          required: true,
+        },
+        duration: {
+          type: String,
+          required: true,
+        },
       },
     ],
   },
