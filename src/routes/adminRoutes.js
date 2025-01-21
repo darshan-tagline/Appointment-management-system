@@ -25,11 +25,12 @@ const validateCategory = require("../middleware/categoryMiddleware");
 const validateMedicine = require("../middleware/medicineMiddleware");
 const validateDoctor = require("../middleware/doctorMiddleware");
 const authenticateToken = require("../middleware/authMiddleware");
+const validatee = require("../middleware/validateMiddleware");
 
 const adminRouter = express.Router();
 
 //Login
-adminRouter.post("/login", validateAdmin, adminLogin);
+adminRouter.post("/login", validatee(validateAdmin), adminLogin);
 
 //Category
 adminRouter.post(
