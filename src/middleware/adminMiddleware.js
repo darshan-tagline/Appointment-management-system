@@ -8,10 +8,11 @@ const authorize = async (req, res, next) => {
     if (!token) {
       return sendResponse(res, 403, "Access denied. No token provided.");
     }
-    const { email } = tokenVarification(token);
-    const user = await findAdmin(email);
+    const { data } = tokenVarification(token);
+
+    const user = await findAdmin({ email: data });
     if (!user) {
-      return sendResponse(res, 404, "User not found.");
+      return sendResponse(res, 401, "Unauthorized");
     }
     req.user = user;
     next();

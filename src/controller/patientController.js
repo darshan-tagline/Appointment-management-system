@@ -1,15 +1,16 @@
 const sendResponse = require("../utils/responseUtils");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { tokenGeneration } = require("../utils/token");
+const { tokenGeneration, tokenDecode } = require("../utils/token");
 const { addNewPatient, findPatient } = require("../service/patientServices");
 const {
-  findAlready,
   addNewAppoinment,
   findTimeSlot,
   findAppointmentByPatientId,
+  findBooking,
 } = require("../service/appoinmentServices");
 const { passwordHash, passwordCompare } = require("../utils/passwordUtils");
+const { findDoctor } = require("../service/doctorServices");
+const { findCasesByPatient } = require("../service/caseServices");
 
 const patientSignUp = async (req, res) => {
   try {
@@ -25,7 +26,7 @@ const patientSignUp = async (req, res) => {
       password: hashedPassword,
     };
     const patient = await addNewPatient(patientData);
-    const token = await tokenGeneration(patient.email);
+    const token = await tokenGeneration(patient._id);
     return sendResponse(res, 201, "Account created successfully", { token });
   } catch (error) {
     console.log("error", error);
@@ -44,7 +45,7 @@ const paientLogin = async (req, res) => {
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    const token = tokenGeneration(user.email);
+    const token = tokenGeneration(user._id);
     return sendResponse(res, 200, "Login successful", { token });
   } catch (error) {
     console.log("error", error);
@@ -60,21 +61,30 @@ const createAppointment = async (req, res) => {
       return sendResponse(res, 401, "Authorization token is missing");
     }
 
-    const { id } = jwt.decode(token, process.env.JWT_SECRET);
+    const { data } = await tokenDecode(token);
 
-    const checkBooking = { patientId: id, doctorId, date, timeSlot, symptoms };
-    const already = await findAlready(checkBooking);
+    const checkBooking = {
+      patientId: data,
+      doctorId,
+      date,
+      timeSlot,
+      symptoms,
+    };
+    const validDoctorId = await findDoctor({ _id: doctorId });
+    if (!validDoctorId) {
+      return sendResponse(res, 400, "Doctor not found");
+    }
+    const already = await findBooking(checkBooking);
     if (already) {
       return sendResponse(res, 400, "Appointment already exists");
     }
-
     const checktimeSlot = await findTimeSlot(doctorId, date, timeSlot);
     if (checktimeSlot) {
       return sendResponse(res, 400, "timeSlot slot already booked");
     }
 
     const newAppointment = {
-      patientId: id,
+      patientId: data,
       doctorId,
       date,
       timeSlot,
@@ -91,12 +101,12 @@ const createAppointment = async (req, res) => {
 
 const getAppoinment = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return sendResponse(res, 401, "Authorization token is missing");
+    const patientId = req.user.id;
+
+    const appointments = await findAppointmentByPatientId(patientId);
+    if (!appointments || appointments.length === 0) {
+      return sendResponse(res, 404, "No appointments found.");
     }
-    const { id } = jwt.decode(token, process.env.JWT_SECRET);
-    const appointments = await findAppointmentByPatientId(id);
     return sendResponse(
       res,
       200,
@@ -109,9 +119,24 @@ const getAppoinment = async (req, res) => {
   }
 };
 
+const viewCase = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const data = await findCasesByPatient({ patientId });
+    if (!data) {
+      return sendResponse(res, 404, "Case not found");
+    }
+    return sendResponse(res, 200, "Case fetched successfully", data);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
 module.exports = {
   paientLogin,
   patientSignUp,
   createAppointment,
   getAppoinment,
+  viewCase,
 };

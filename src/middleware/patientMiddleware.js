@@ -1,8 +1,7 @@
 const sendResponse = require("../utils/responseUtils");
-const { tokenVarification } = require("../utils/token");
-const { findDoctor } = require("../service/doctorServices");
-
-const authorizeDoctor = async (req, res, next) => {
+const { tokenVarification, tokenDecode } = require("../utils/token");
+const { findPatient } = require("../service/patientServices");
+const authorizePatient = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");
     if (!authHeader) {
@@ -16,7 +15,7 @@ const authorizeDoctor = async (req, res, next) => {
     }
 
     const data = tokenVarification(token);
-    const user = await findDoctor({ id: data.id });
+    const user = await findPatient({ id: data.id });
     if (!user) {
       return sendResponse(res, 404, "User not found.");
     }
@@ -28,4 +27,4 @@ const authorizeDoctor = async (req, res, next) => {
   }
 };
 
-module.exports = authorizeDoctor;
+module.exports = authorizePatient;

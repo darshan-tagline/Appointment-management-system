@@ -47,7 +47,7 @@ const adminLogin = async (req, res) => {
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    const token = tokenGeneration(process.env.ADMIN_ID);
+    const token = tokenGeneration(process.env.ADMIN_EMAIL);
     return sendResponse(res, 200, "Login successful", { token });
   } catch (error) {
     console.log("error", error);
@@ -179,8 +179,6 @@ const addMedicine = async (req, res) => {
 const getAllMedicines = async (req, res) => {
   try {
     const medicines = await findAllMedicines();
-    console.log("hey");
-
     if (medicines.length === 0) {
       return sendResponse(res, 404, "Medicines not found");
     }

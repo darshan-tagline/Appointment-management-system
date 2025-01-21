@@ -14,10 +14,9 @@ const caseSchema = new mongoose.Schema(
     },
     appointmentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Doctor",
+      ref: "Appointment",
       required: true,
     },
-    status: { type: String, default: "pending" },
   },
   { timestamps: true }
 );

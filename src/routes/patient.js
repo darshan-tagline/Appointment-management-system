@@ -4,21 +4,23 @@ const {
   patientSignUp,
   createAppointment,
   getAppoinment,
+  viewCase,
 } = require("../controller/patientController");
 
 const validate = require("../middleware/validateMiddleware");
-const patientValidator = require("../validators/patientValidation");
-const appointmentValidator = require("../validators/appoinmentValidation");
+const authorizePatient = require("../middleware/patientMiddleware");
+const patientValidatorSchema = require("../validators/patientValidation");
+const appointmentValidatorSchema = require("../validators/appoinmentValidation");
 const patientRouter = express.Router();
 
-patientRouter.post("/signup", validate(patientValidator), patientSignUp);
+patientRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
 patientRouter.post("/login", paientLogin);
 patientRouter.post(
   "/appoinment",
-  validate(appointmentValidator),
-
+  validate(appointmentValidatorSchema),
   createAppointment
 );
-patientRouter.get("/appoinment", getAppoinment);
+patientRouter.get("/appoinment", authorizePatient, getAppoinment);
+patientRouter.get("/case", authorizePatient, viewCase);
 
 module.exports = patientRouter;
