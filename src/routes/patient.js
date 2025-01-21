@@ -7,6 +7,7 @@ const {
 } = require("../controller/patientController");
 
 const validate = require("../middleware/validateMiddleware");
+const authorizePatient = require("../middleware/patientMiddleware");
 const patientValidator = require("../validators/patientValidation");
 const appointmentValidator = require("../validators/appoinmentValidation");
 const patientRouter = express.Router();
@@ -16,7 +17,6 @@ patientRouter.post("/login", paientLogin);
 patientRouter.post(
   "/appoinment",
   validate(appointmentValidator),
-
   createAppointment
 );
 patientRouter.get("/appoinment", getAppoinment);

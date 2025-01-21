@@ -8,6 +8,7 @@ const {
   findAppointmentByDoctorId,
 } = require("../service/appoinmentServices");
 const { addNewCase } = require("../service/caseServices");
+const { passwordCompare } = require("../utils/passwordUtils");
 
 const doctorLogin = async (req, res) => {
   try {
@@ -16,7 +17,7 @@ const doctorLogin = async (req, res) => {
     if (!doctor) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    const isPasswordMatch = await bcrypt.compare(password, doctor.password);
+    const isPasswordMatch = await passwordCompare(password, doctor.password);
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
@@ -28,45 +29,50 @@ const doctorLogin = async (req, res) => {
   }
 };
 
-const viewAndUpdateAppointment = async (req, res) => {
+const getappoinment = async (req, res) => {
   try {
-    const { status } = req.body;
     const token = req.headers.authorization?.split(" ")[1];
-    const { id } = jwt.decode(token, process.env.JWT_SECRET);
-    const appointment = await updateStatus(id, status);
-
-    if (!appointment) {
-      return sendResponse(res, 404, "Appointment not found or already updated");
+    if (!token) {
+      return sendResponse(res, 401, "Authorization token is missing");
     }
-
-    if (status === "approved") {
-      const data = await findAppointmentByDoctorId(id);
-      console.log(data);
-
-      const caseData = {
-        patientId: data.patientId,
-        doctorId: data.doctorId,
-        appointmentId: data._id,
-        status: "pending",
-      };
-
-      const newCase = await addNewCase(caseData);
-
-      if (!newCase) {
-        return sendResponse(res, 500, "Error while creating case");
-      }
-    }
-
+    const { data } = jwt.decode(token, process.env.JWT_SECRET);
+    const appointments = await findAppointmentByDoctorId(data);
     return sendResponse(
       res,
       200,
-      "Appointment status updated successfully",
-      appointment
+      "Appointments fetched successfully",
+      appointments
     );
   } catch (error) {
-    console.log("Error updating appointment or creating case:", error);
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+const updateAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const appointment = await updateStatus(id, status);
+    if (!appointment) {
+      return sendResponse(res, 404, "Appointment not found");
+    }
+    const newCase = {
+      appointmentId: appointment._id,
+      patientId: appointment.patientId,
+      doctorId: appointment.doctorId,
+    };
+
+    const caseCreated = await addNewCase(newCase);
+    return sendResponse(
+      res,
+      200,
+      "Appointment updated successfully and case created",
+      {appointment, caseCreated}
+    );
+  } catch (error) {
+    console.log("error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
 
-module.exports = { doctorLogin, viewAndUpdateAppointment };
+module.exports = { doctorLogin, updateAppointment, getappoinment };
