@@ -2,9 +2,10 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const connectDB = require("../config/db");
-const  sendResponse  = require("./utils/responseUtils");
-
+const sendResponse = require("./utils/responseUtils");
 const router = require("./routes/router");
+connectDB();
+// createAdmin();
 const port = process.env.PORT || 3000;
 app.use(express.json());
 
@@ -19,8 +20,4 @@ app.use((err, req, res, next) => {
   sendResponse(res, 500, err.message);
 });
 
-// createAdmin();
-connectDB();
-app.listen(port, () =>
-  console.log(`Server is running on http://localhost:${port}`)
-);
+app.listen(port, () => console.log(`Server is connected`));

@@ -1,13 +1,13 @@
 const Patient = require("../model/patientModel");
 
-const findPatientByEmail = async (email) => {
-  return Patient.findOne({ email });
+const findPatient = async (data) => {
+  return Patient.findOne(data);
 };
 
 const addNewPatient = async (patient) => {
   return Patient.create(patient);
 };
 module.exports = {
-  findPatientByEmail,
+  findPatient,
   addNewPatient,
 };

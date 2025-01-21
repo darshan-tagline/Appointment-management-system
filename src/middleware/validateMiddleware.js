@@ -1,6 +1,6 @@
 const sendResponse = require("../utils/responseUtils");
 
-const validatee = (schema) => async (req, res, next) => {
+const validate = (schema) => async (req, res, next) => {
   try {
     const dataToValidate = { ...req.body, ...req.query, ...req.params };
 
@@ -29,4 +29,4 @@ const validatee = (schema) => async (req, res, next) => {
   }
 };
 
-module.exports = validatee;
+module.exports = validate;
