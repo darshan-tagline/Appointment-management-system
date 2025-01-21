@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const appointmentSchema = new mongoose.Schema(
   {
     doctorId: {
@@ -19,6 +18,7 @@ const appointmentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
