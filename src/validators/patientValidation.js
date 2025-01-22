@@ -16,7 +16,7 @@ const patientValidatorSchema = Joi.object({
       "any.required": "Email is required.",
     }),
 
-  password: Joi.string().min(6).required().messages({
+  password: Joi.string().min(6).messages({
     "string.min": "Password must be at least 6 characters long.",
     "any.required": "Password is required.",
   }),
