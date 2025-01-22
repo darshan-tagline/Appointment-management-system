@@ -24,9 +24,7 @@ const addNewAppoinment = async (newAppointment) => {
 const findAppointment = async (data) => {
   return Appointment.find(data);
 };
-const findAppointmentByDoctorId = async (data) => {
-  return Appointment.find(data).sort({ updatedAt: -1 });
-};
+
 
 const updateStatus = async (id, status) => {
   return Appointment.findOneAndUpdate({ _id: id }, { status }, { new: true });
@@ -37,6 +35,5 @@ module.exports = {
   findTimeSlot,
   addNewAppoinment,
   findAppointment,
-  findAppointmentByDoctorId,
   updateStatus,
 };
