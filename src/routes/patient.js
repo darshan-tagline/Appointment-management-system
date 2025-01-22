@@ -7,6 +7,7 @@ const {
   viewCase,
   getHearing,
   addHearingRequest,
+  validateOTP,
 } = require("../controller/patientController");
 
 const validate = require("../middleware/validateMiddleware");
@@ -17,6 +18,7 @@ const hearingRequestValidatorSchema = require("../validators/hearingRequestValid
 const patientRouter = express.Router();
 
 patientRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
+patientRouter.post("/validate-otp", validateOTP);
 patientRouter.post("/login", paientLogin);
 patientRouter.post(
   "/appoinment",
@@ -26,10 +28,6 @@ patientRouter.post(
 patientRouter.get("/appoinment", authorizePatient, getAppoinment);
 patientRouter.get("/case", authorizePatient, viewCase);
 patientRouter.get("/hearingrequest/:id", authorizePatient, getHearing);
-patientRouter.post(
-  "/hearingrequest",
-  authorizePatient,
-  addHearingRequest
-);
+patientRouter.post("/hearingrequest", authorizePatient, addHearingRequest);
 
 module.exports = patientRouter;
