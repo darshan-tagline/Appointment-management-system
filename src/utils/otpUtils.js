@@ -1,9 +1,11 @@
 const { findPatientandupdate } = require("../service/patientServices");
 
+
 const {
   findPatientandupdate,
   
 } = require("../service/patientServices");
+
 const sendEmail = require("./sendMail");
 
 const generateOtp = () => {
@@ -32,6 +34,7 @@ Note: This OTP is valid for a limited time and can only be used once.`
     );
 
     await sendEmail(patient.email, "Your OTP Code", `Your OTP is ${otp}`);
+
 
   } catch (error) {
     console.error("Error sending OTP:", error);

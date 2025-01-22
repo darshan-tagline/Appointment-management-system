@@ -7,6 +7,8 @@ const passport = require("passport");
 const sendResponse = require("./utils/responseUtils");
 const router = require("./routes/router");
 const passportUtils = require('./utils/passport');
+
+const passportUtils = require('./utils/passportUtils');
 connectDB();
 // createAdmin();
 const port = process.env.PORT || 3000;
