@@ -15,8 +15,8 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
   cookieSession({
-    maxAge: 24 * 60 * 60 * 1000,  // 24 hours
-    keys: [process.env.SESSION_SECRET],  // Use a session secret stored in .env file
+    maxAge: 24 * 60 * 60 * 1000,  
+    keys: [process.env.SESSION_SECRET],  
   })
 );
 app.use(passport.initialize());
