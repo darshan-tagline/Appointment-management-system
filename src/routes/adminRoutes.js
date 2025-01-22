@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   adminLogin,
-  addCtegory,
+  addCategory,
   getAllCategories,
   deleteCategory,
   updateCategory,
@@ -34,7 +34,7 @@ adminRouter.post(
   "/category",
   validate(categoryValidatorSchema),
   authorize,
-  addCtegory
+  addCategory
 );
 adminRouter.get("/category", authorize, getAllCategories);
 adminRouter.put(

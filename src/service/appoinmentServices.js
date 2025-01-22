@@ -5,15 +5,15 @@ const findBooking = async (checkBooking) => {
 };
 
 const findTimeSlot = async (doctorId, date, time) => {
-   const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0); 
-  
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+
   const endOfDay = new Date(date);
   endOfDay.setHours(23, 59, 59, 999);
   return Appointment.findOne({
     doctorId,
-    date: { $gte: startOfDay, $lte: endOfDay }, 
-    timeSlot: time, 
+    date: { $gte: startOfDay, $lte: endOfDay },
+    timeSlot: time,
   });
 };
 
@@ -21,11 +21,11 @@ const addNewAppoinment = async (newAppointment) => {
   return Appointment.create(newAppointment);
 };
 
-const findAppointmentByPatientId = async (data) => {
-  return Appointment.find({ patientId: data });
+const findAppointment = async (data) => {
+  return Appointment.find(data);
 };
-const findAppointmentByDoctorId = async (id) => {
-  return Appointment.find({ doctorId: id }).sort({ updatedAt: -1 });
+const findAppointmentByDoctorId = async (data) => {
+  return Appointment.find(data).sort({ updatedAt: -1 });
 };
 
 const updateStatus = async (id, status) => {
@@ -36,7 +36,7 @@ module.exports = {
   findBooking,
   findTimeSlot,
   addNewAppoinment,
-  findAppointmentByPatientId,
+  findAppointment,
   findAppointmentByDoctorId,
   updateStatus,
 };

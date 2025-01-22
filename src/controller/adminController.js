@@ -1,5 +1,4 @@
 const sendResponse = require("../utils/responseUtils");
-const bcrypt = require("bcrypt");
 const { tokenGeneration } = require("../utils/token");
 const {
   addNewCategory,
@@ -16,7 +15,7 @@ const {
   findAllMedicines,
   modifyMedicine,
   removeMedicine,
-  searchMedicinesByname,
+
   findMedicine,
   searchMedicines,
 } = require("../service/medicineServices");
@@ -27,12 +26,10 @@ const {
   findDoctorById,
   modifyDoctor,
   removeDoctor,
-  searchDoctorByName,
   searchDoctor,
 } = require("../service/doctorServices");
 const sendEmail = require("../utils/sendMail");
 const { default: mongoose } = require("mongoose");
-const Doctor = require("../model/doctorModel");
 const findAdmin = require("../service/adminServices");
 const { passwordCompare, passwordHash } = require("../utils/passwordUtils");
 
@@ -55,11 +52,11 @@ const adminLogin = async (req, res) => {
   }
 };
 
-const addCtegory = async (req, res) => {
+const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    const already = await findCategory({ name });
-    if (already) {
+    const alreadyExist = await findCategory({ name });
+    if (alreadyExist) {
       return sendResponse(res, 400, "Category already exists");
     }
     await addNewCategory({ name, description });
@@ -93,7 +90,6 @@ const searchCategories = async (req, res) => {
     const skip = (page - 1) * limit;
 
     let categories;
-
     if (mongoose.Types.ObjectId.isValid(input)) {
       const category = await findCategoryById(input);
       if (category) {
@@ -123,8 +119,8 @@ const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description } = req.body;
-    const already = await findCategory({ name });
-    if (already) {
+    const alreadyExist = await findCategory({ name });
+    if (alreadyExist) {
       return sendResponse(res, 400, "Category already exists");
     }
     const updatedCategory = await modifyCategory(id, {
@@ -164,12 +160,12 @@ const deleteCategory = async (req, res) => {
 const addMedicine = async (req, res) => {
   try {
     const { name, price } = req.body;
-    const already = await findMedicine({ name });
-    if (already) {
+    const alreadyExist = await findMedicine({ name });
+    if (alreadyExist) {
       return sendResponse(res, 400, "Medicine already exists");
     }
     await addNewMedicine({ name, price });
-    return sendResponse(res, 201, "Medicine created successfully");
+    return sendResponse(res, 201, "Medicine added successfully");
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -193,8 +189,8 @@ const updateMedicine = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price } = req.body;
-    const already = await findMedicine({ name });
-    if (already) {
+    const alreadyExist = await findMedicine({ name });
+    if (alreadyExist) {
       return sendResponse(res, 400, "Medicine already exists");
     }
     const updatedMedicine = await modifyMedicine(id, {
@@ -238,7 +234,6 @@ const searchMedicine = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-
     let medicines;
 
     if (mongoose.Types.ObjectId.isValid(input)) {
@@ -265,21 +260,21 @@ const searchMedicine = async (req, res) => {
 
 const createDoctor = async (req, res) => {
   try {
-    const { name, email, password, category } = req.body;
-    const already = await findDoctor({ email });
-    const validCategory = await findCategoryById(category);
+    const { name, email, password, categoryId } = req.body;
+    const alreadyExist = await findDoctor({ email });
+    if (alreadyExist) {
+      return sendResponse(res, 400, "Doctor already exists");
+    }
+    const validCategory = await findCategoryById(categoryId);
     if (!validCategory) {
       return sendResponse(res, 400, "Category not found");
-    }
-    if (already) {
-      return sendResponse(res, 400, "Doctor already exists");
     }
     const hashedPassword = await passwordHash(password);
     const doctorData = {
       name,
       email,
       password: hashedPassword,
-      category,
+      categoryId,
     };
     await addDoctor(doctorData);
     const subject = "Welcome to the System - Your Login Details";
@@ -322,20 +317,20 @@ const getAllDoctors = async (req, res) => {
 const updateDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, category, password } = req.body;
-    const validCategory = await findCategoryById(category);
+    const { name, email, categoryId, password } = req.body;
+    const validCategory = await findCategoryById(categoryId);
     if (!validCategory) {
       return sendResponse(res, 400, "Category not found");
     }
-    const already = await findDoctor({ email });
-    if (already) {
+    const alreadyExist = await findDoctor({ email });
+    if (alreadyExist) {
       return sendResponse(res, 400, "Doctor already exists");
     }
     const hashedPassword = await passwordHash(password);
     const doctor = await modifyDoctor(id, {
       name,
       email,
-      category,
+      categoryId,
       password: hashedPassword,
     });
     if (!doctor) {
@@ -380,7 +375,7 @@ const searchDoctors = async (req, res) => {
         doctors = [];
       }
     } else {
-      doctors = await  searchDoctor(input, skip, limit);
+      doctors = await searchDoctor(input, skip, limit);
     }
 
     if (!doctors || doctors.length === 0) {
@@ -397,7 +392,7 @@ module.exports = {
   adminLogin,
 
   //category
-  addCtegory,
+  addCategory,
   getAllCategories,
   searchCategories,
   deleteCategory,

@@ -1,20 +1,15 @@
 const Joi = require("joi");
 
 const appointmentValidatorSchema = Joi.object({
-  doctorId: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .required()
-    .messages({
-      "string.pattern.base": "Doctor ID must be a valid ObjectId.",
-      "any.required": "Doctor ID is required.",
-    }),
-  date: Joi.date()
-    .greater("now") 
-    .messages({
-      "date.base": "Date must be a valid date.",
-      "date.greater": "Date must be in the future.",
-      "any.required": "Date is required.",
-    }),
+  doctorId: Joi.string().hex().length(24).required().messages({
+    "string.pattern.base": "Doctor ID must be a valid ObjectId.",
+    "any.required": "Doctor ID is required.",
+  }),
+  date: Joi.date().greater("now").messages({
+    "date.base": "Date must be a valid date.",
+    "date.greater": "Date must be in the future.",
+    "any.required": "Date is required.",
+  }),
   timeSlot: Joi.string()
     .required()
     .custom((value, helpers) => {
