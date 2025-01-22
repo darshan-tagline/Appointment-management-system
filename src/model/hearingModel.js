@@ -13,7 +13,7 @@ const hearingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Completed", "In Progress"],
+      enum: ["resolved", "In Progress"],
       default: "In Progress",
     },
     prescription: [

@@ -1,16 +1,20 @@
 const sendResponse = require("../utils/responseUtils");
-const jwt = require("jsonwebtoken");
 const { tokenGeneration, tokenDecode } = require("../utils/token");
 const { addNewPatient, findPatient } = require("../service/patientServices");
 const {
   addNewAppoinment,
   findTimeSlot,
-  findAppointmentByPatientId,
   findBooking,
+  findAppointment,
 } = require("../service/appoinmentServices");
 const { passwordHash, passwordCompare } = require("../utils/passwordUtils");
 const { findDoctor } = require("../service/doctorServices");
 const { findCasesByPatient } = require("../service/caseServices");
+const { findHearing } = require("../service/hearingServices");
+const {
+  createHearingRequest,
+  findHearingRequest,
+} = require("../service/hearingRequestServices");
 
 const patientSignUp = async (req, res) => {
   try {
@@ -101,9 +105,8 @@ const createAppointment = async (req, res) => {
 
 const getAppoinment = async (req, res) => {
   try {
-    const patientId = req.user.id;
-
-    const appointments = await findAppointmentByPatientId(patientId);
+    const patientId = req.user.id; 
+    const appointments = await findAppointment({ patientId });
     if (!appointments || appointments.length === 0) {
       return sendResponse(res, 404, "No appointments found.");
     }
@@ -133,10 +136,63 @@ const viewCase = async (req, res) => {
   }
 };
 
+const addHearingRequest = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const { caseId, reason } = req.body;
+
+    const caseData = await findCasesByPatient({ patientId });
+    if (!caseData || caseData.length === 0) {
+      return sendResponse(res, 404, "No cases found for the patient");
+    }
+
+    const alreadyExists = await findHearingRequest({ caseId });
+    if (alreadyExists) {
+      return sendResponse(res, 400, "Hearing request already exists");
+    }
+
+    const newHearingRequest = await createHearingRequest({
+      caseId,
+      patientId,
+      reason,
+    });
+
+    return sendResponse(
+      res,
+      201,
+      "Hearing request created successfully",
+      newHearingRequest
+    );
+  } catch (error) {
+    console.error("Error creating hearing request:", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const getHearing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await findHearingRequest({ _id: id });
+    if (!data) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+    return sendResponse(res, 200, "Hearing fetched successfully", data);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
 module.exports = {
+  //auth
   paientLogin,
   patientSignUp,
+  //appointment
   createAppointment,
   getAppoinment,
+  //case
   viewCase,
+  //hearingRequest
+  getHearing,
+  addHearingRequest,
 };

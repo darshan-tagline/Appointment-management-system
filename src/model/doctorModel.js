@@ -15,7 +15,7 @@ const doctorSchema = new mongoose.Schema(
       lowercase: true,
       match: [/.+@.+\..+/, "Please provide a valid email address"],
     },
-    category: {
+    categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: [true, "Category is required"], 

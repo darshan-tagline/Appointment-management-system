@@ -1,7 +1,7 @@
 const Doctor = require("../model/doctorModel");
 
 const findDoctor = async (data) => {
-  console.log(data);
+console.log(data);
 
   return Doctor.findOne(data);
 };
@@ -11,6 +11,8 @@ const addDoctor = async (doctorData) => {
 };
 
 const findDoctorById = async (id) => {
+  console.log(id);
+  
   return Doctor.findById(id);
 };
 

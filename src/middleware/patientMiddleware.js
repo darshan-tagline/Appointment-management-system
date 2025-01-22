@@ -14,8 +14,8 @@ const authorizePatient = async (req, res, next) => {
       return sendResponse(res, 403, "Access denied. No token provided.");
     }
 
-    const data = tokenVarification(token);
-    const user = await findPatient({ id: data.id });
+    const {data} = tokenVarification(token);   
+    const user = await findPatient({ _id: data });
     if (!user) {
       return sendResponse(res, 404, "User not found.");
     }

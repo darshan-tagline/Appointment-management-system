@@ -16,13 +16,10 @@ const doctorValidatorSchema = Joi.object({
       "any.required": "Email is required.",
     }),
 
-  category: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/) 
-    .required()
-    .messages({
-      "string.pattern.base": "Category must be a valid ObjectId.",
-      "any.required": "Category is required.",
-    }),
+  categoryId: Joi.string().hex().length(24).required().messages({
+    "string.pattern.base": "Category must be a valid ObjectId.",
+    "any.required": "Category is required.",
+  }),
 
   password: Joi.string().min(6).required().messages({
     "string.min": "Password must be at least 6 characters long.",
@@ -30,4 +27,4 @@ const doctorValidatorSchema = Joi.object({
   }),
 });
 
-module.exports =  doctorValidatorSchema;
+module.exports = doctorValidatorSchema;
