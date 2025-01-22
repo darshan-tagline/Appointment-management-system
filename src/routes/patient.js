@@ -27,9 +27,9 @@ patientRouter.get(
 
 patientRouter.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
+  passport.authenticate("google", { failureRedirect: "/signup" }),
   (req, res) => {
-    res.redirect("/");
+    res.redirect("/api/patient/appoinment");
   }
 );
 
