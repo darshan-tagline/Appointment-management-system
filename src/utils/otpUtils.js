@@ -1,4 +1,9 @@
 const { findPatientandupdate } = require("../service/patientServices");
+
+const {
+  findPatientandupdate,
+  
+} = require("../service/patientServices");
 const sendEmail = require("./sendMail");
 
 const generateOtp = () => {
@@ -25,12 +30,19 @@ Your One-Time Password (OTP) for verification is: ${otp}.
 Please enter this OTP to complete your request.
 Note: This OTP is valid for a limited time and can only be used once.`
     );
+
+    await sendEmail(patient.email, "Your OTP Code", `Your OTP is ${otp}`);
+
   } catch (error) {
     console.error("Error sending OTP:", error);
   }
 };
 
+
 module.exports = {
   generateOtp,
   sendOTP,
 };
+
+
+

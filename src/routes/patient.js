@@ -19,6 +19,7 @@ const passport = require("passport");
 const patientRouter = express.Router();
 
 patientRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
+
 patientRouter.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -31,6 +32,7 @@ patientRouter.get(
     res.redirect("/");
   }
 );
+
 patientRouter.post("/validate-otp", validateOTP);
 patientRouter.post("/login", paientLogin);
 patientRouter.post(
