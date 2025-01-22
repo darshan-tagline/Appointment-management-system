@@ -4,7 +4,6 @@ const { tokenGeneration } = require("../utils/token");
 const {
   updateStatus,
   findAppointment,
-  findAppointmentByDoctorId,
 } = require("../service/appoinmentServices");
 const {
   addNewCase,
@@ -18,7 +17,6 @@ const {
   updateHearingData,
 } = require("../service/hearingServices");
 const { createBill, findBill } = require("../service/billServices");
-const { default: mongoose } = require("mongoose");
 
 const doctorLogin = async (req, res) => {
   try {
