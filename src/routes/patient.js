@@ -15,9 +15,22 @@ const authorizePatient = require("../middleware/patientMiddleware");
 const patientValidatorSchema = require("../validators/patientValidation");
 const appointmentValidatorSchema = require("../validators/appoinmentValidation");
 const hearingRequestValidatorSchema = require("../validators/hearingRequestValidation");
+const passport = require("passport");
 const patientRouter = express.Router();
 
 patientRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
+patientRouter.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+patientRouter.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
 patientRouter.post("/validate-otp", validateOTP);
 patientRouter.post("/login", paientLogin);
 patientRouter.post(

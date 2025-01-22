@@ -1,7 +1,4 @@
-const {
-  findPatientandupdate,
-  
-} = require("../service/patientServices");
+const { findPatientandupdate } = require("../service/patientServices");
 const sendEmail = require("./sendMail");
 
 const generateOtp = () => {
@@ -20,37 +17,20 @@ const sendOTP = async (email) => {
       otpExpires,
     });
 
-    await sendEmail(patient.email, "Your OTP Code", `Your OTP is ${otp}`);
+    await sendEmail(
+      patient.email,
+      "Verify Your Account: OTP Inside",
+      `Dear User,
+Your One-Time Password (OTP) for verification is: ${otp}.
+Please enter this OTP to complete your request.
+Note: This OTP is valid for a limited time and can only be used once.`
+    );
   } catch (error) {
     console.error("Error sending OTP:", error);
   }
 };
 
-// const validateOTP = async (email, otp) => {
-//   try {
-//     const user = await findPatient({ email });
-
-//     if (!user || !user.otp) {
-//       return sendResponse(res, 400, "OTP not found.");
-//     }
-
-//     if (new Date() > user.otpExpires) {
-//       return sendResponse(res, 400, "OTP has expired.");
-//     }
-
-//     if (user.otp !== otp) {
-//       return sendResponse(res, 400, "Invalid OTP.");
-//     }
-
-//     return sendResponse(res, 200, "OTP validated successfully.");
-//   } catch (error) {
-//     console.error("Error validating OTP:", error);
-//     return sendResponse(res, 500, "Server error.");
-//   }
-// };
-
 module.exports = {
   generateOtp,
   sendOTP,
-//   validateOTP,
 };

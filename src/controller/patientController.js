@@ -2,7 +2,6 @@ const sendResponse = require("../utils/responseUtils");
 const { tokenGeneration, tokenDecode } = require("../utils/token");
 const {
   addNewPatient,
-  findPatient,
   findPatientByVal,
 } = require("../service/patientServices");
 const {
@@ -23,21 +22,28 @@ const { sendOTP } = require("../utils/otpUtils");
 const patientSignUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const alreadyExists = await findPatientByVal({ email });
-    if (alreadyExists) {
-      return sendResponse(res, 400, "Patient already exists");
+
+    if (!email || !password) {
+      return res.redirect("/auth/google");
     }
-    const hashedPassword = await passwordHash(password);
-    const patientData = {
-      name,
-      email,
-      password: hashedPassword,
-    };
-    const patient = await addNewPatient(patientData);
 
-    await sendOTP(patient.email);
+    if (email && password) {
+      const alreadyExists = await findPatientByVal({ email });
+      if (alreadyExists) {
+        return sendResponse(res, 400, "Patient already exists");
+      }
 
-    return sendResponse(res, 201, "Account created successfully. OTP sent.");
+      const hashedPassword = await passwordHash(password);
+      const patientData = {
+        name,
+        email,
+        password: hashedPassword,
+      };
+      const patient = await addNewPatient(patientData);
+
+      await sendOTP(patient.email);
+      return sendResponse(res, 201, "Account created successfully. OTP sent.");
+    }
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -70,7 +76,7 @@ const validateOTP = async (req, res) => {
 const paientLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await findPatient({ email });
+    const user = await findPatientByVal({ email });
     if (!user) {
       return sendResponse(res, 401, "Invalid email or password");
     }
