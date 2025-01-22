@@ -13,13 +13,13 @@ passport.deserializeUser((user, done) => {
 passport.use(
     new GoogleStrategy(
         {
-            clientID: '631794870163-5taui1e34smue4qrri1nota6v5758lhc.apps.googleusercontent.com', 
-            clientSecret: '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',
+            clientID: process.env.CLIENT_ID, 
+            clientSecret:  process.env.CLIENT_SECRET,
             callbackURL: 'http://localhost:3000/api/patient/auth/google/callback',
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                const email = profile.emails[0].value;
+                const email =  profile.emails[0].value;
 
                
                 let patient = await findPatientByVal({ email });
@@ -28,7 +28,8 @@ passport.use(
                     const patientData = {
                         name: profile.displayName,
                         email,
-                        password: null, 
+                        password: null,  
+
                     };
                     patient = await addNewPatient(patientData);
                 }

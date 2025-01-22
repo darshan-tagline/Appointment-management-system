@@ -6,7 +6,7 @@ const cookieSession = require("cookie-session");
 const passport = require("passport");
 const sendResponse = require("./utils/responseUtils");
 const router = require("./routes/router");
-const passportUtils = require('./utils/passportUtils');
+const passportUtils = require('./utils/passport');
 connectDB();
 // createAdmin();
 const port = process.env.PORT || 3000;
