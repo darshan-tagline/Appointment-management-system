@@ -33,8 +33,9 @@ passport.use(
           };
           patient = await addNewPatient(patientData);
         }
+        const userWithToken = { ...patient.toObject(), accessToken };
 
-        return done(null, patient);
+        return done(null, userWithToken);
       } catch (error) {
         return done(error, null);
       }

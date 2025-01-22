@@ -9,7 +9,7 @@ const {
   addHearingRequest,
   validateOTP,
 } = require("../controller/patientController");
-
+const sendResponse = require("../utils/responseUtils");
 const validate = require("../middleware/validateMiddleware");
 const authorizePatient = require("../middleware/patientMiddleware");
 const patientValidatorSchema = require("../validators/patientValidation");
@@ -29,7 +29,9 @@ patientRouter.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/signup" }),
   (req, res) => {
-    res.redirect("/api/patient/appoinment");
+    return sendResponse(res, 200, "Google login successful", {
+      patient: req.user,
+    });
   }
 );
 
