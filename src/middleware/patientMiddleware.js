@@ -1,7 +1,8 @@
+// const axios = require("axios");
 const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
 const { findPatient } = require("../service/patientServices");
-const { refreshAccessToken } = require("../utils/passport");
+const passport = require("passport");
 
 const authorizePatient = async (req, res, next) => {
   try {
@@ -18,45 +19,55 @@ const authorizePatient = async (req, res, next) => {
       return sendResponse(res, 403, "Access denied. No token provided.");
     }
 
-    let decoded;
+    let user;
+
     try {
-      decoded = tokenVarification(token);
-    } catch (error) {
-      return sendResponse(res, 401, "Invalid or expired token.");
-    }
-
-    const { data: patientId } = decoded;
-  
-    const user = await findPatient({ _id: patientId });
-
-    if (!user) {
-      return sendResponse(res, 404, "User not found.");
-    }
-
-    if (user.refreshToken) {
-      const tokenExpiryTime = decoded.exp * 1000;
-      const currentTime = new Date().getTime();
-
-      if (currentTime > tokenExpiryTime) {
-        const { access_token, refresh_token } = await refreshAccessToken(
-          user.refreshToken,
-          user
-        );
-
-        res.setHeader("New-Access-Token", access_token);
-        res.setHeader("New-Refresh-Token", refresh_token);
-
-        req.newAccessToken = access_token;
-        req.newRefreshToken = refresh_token;
+       const decoded = await tokenVarification(token);
+      
+      const { data: patientId } = decoded;
+      user = await findPatient({ _id: patientId });
+      if (!user) {
+        return sendResponse(res, 404, "User not found.");
       }
+    } catch (jwtError) {
+      console.error("JWT verification failed:", jwtError.message);
+      return sendResponse(res, 401, "Invalid or expired JWT token.");
     }
 
     req.user = user;
-    next();
+    next(); 
   } catch (error) {
     console.error("Authorization error:", error);
-    return sendResponse(res, 401, "Invalid or expired token.");
+    return sendResponse(res, 500, "Server error.");
   }
 };
 
-module.exports = authorizePatient;
+
+const googleAuth = passport.authenticate("google", {
+  scope: ["openid", "profile", "email"],
+});
+
+const googleAuthCallback = (req, res) => {
+  return sendResponse(res, 200, "Google login successful", {
+    patient: req.user,
+  });
+};
+
+// const verifyGoogleAccessToken = async (accessToken) => {
+//   try {
+//     const response = await axios.get(
+//       `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error verifying access token:", error.response.data);
+//     throw new Error("Invalid or expired access token.");
+//   }
+// };
+
+module.exports = {
+  authorizePatient,
+  googleAuth,
+  googleAuthCallback,
+  // verifyGoogleAccessToken,
+};

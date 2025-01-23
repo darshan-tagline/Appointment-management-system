@@ -6,7 +6,10 @@ const sendEmail = async (to, subject, textContent) => {
       service: "gmail",
       auth: {
         user: "darshanun.taglineinfotech@gmail.com",
-        pass: "esonxuzggbpmruys",
+        pass: process.env.EMAIL_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
@@ -24,4 +27,4 @@ const sendEmail = async (to, subject, textContent) => {
   }
 };
 
-module.exports =  sendEmail ;
+module.exports = sendEmail;

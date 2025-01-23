@@ -65,15 +65,10 @@ const validateOTP = async (req, res) => {
     if (patient.otp !== otp) {
       return sendResponse(res, 400, "Invalid OTP.");
     }
-    const accessToken = tokenGeneration(patient._id, "1d");
-    const refreshToken = tokenGeneration(patient._id, "7d");
+    const accessToken = tokenGeneration(patient._id, "7d");
 
-    await updatePatient(patient._id, {
-      refreshToken,
-    });
     return sendResponse(res, 200, "OTP validated successfully.", {
       accessToken,
-      refreshToken,
     });
   } catch (error) {
     console.error("Error validating OTP:", error);
@@ -91,15 +86,10 @@ const paientLogin = async (req, res) => {
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    const accessToken = tokenGeneration(user._id, "1d");
-    const refreshToken = tokenGeneration(user._id, "7d");
+    const accessToken = tokenGeneration(user._id, "7d");
 
-    await findPatientandupdate(user.email, {
-      refreshToken,
-    });
     return sendResponse(res, 200, "Login successful", {
       accessToken,
-      refreshToken,
     });
   } catch (error) {
     console.log("error", error);
@@ -110,12 +100,11 @@ const paientLogin = async (req, res) => {
 const createAppointment = async (req, res) => {
   try {
     const { doctorId, date, timeSlot, symptoms } = req.body;
+    const data = req.user._id;
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       return sendResponse(res, 401, "Authorization token is missing");
     }
-
-    const { data } = await tokenDecode(token);
 
     const checkBooking = {
       patientId: data,
@@ -155,7 +144,12 @@ const createAppointment = async (req, res) => {
 
 const getAppoinment = async (req, res) => {
   try {
-    const patientId = req.user.id;
+    const { id } = req.user.id;
+    const data = await findPatientByVal({ id });
+    if (!data) {
+      return sendResponse(res, 404, "Patient not found");
+    }
+    const patientId = data._id;
     const appointments = await findAppointment({ patientId });
     if (!appointments || appointments.length === 0) {
       return sendResponse(res, 404, "No appointments found.");
@@ -188,10 +182,10 @@ const viewCase = async (req, res) => {
 
 const addHearingRequest = async (req, res) => {
   try {
-    const patientId = req.user.id;
+    const patientEmail = req.user.email;
     const { caseId, reason } = req.body;
 
-    const caseData = await findCasesByPatient({ patientId });
+    const caseData = await findCasesByPatient({ patientEmail });
     if (!caseData || caseData.length === 0) {
       return sendResponse(res, 404, "No cases found for the patient");
     }
