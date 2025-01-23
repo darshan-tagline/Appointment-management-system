@@ -1,6 +1,6 @@
 const Patient = require("../model/patientModel");
 
-const findPatient = async (data) => {
+const findPatient = async (data) => {  
   return Patient.findById(data);
 };
 const findPatientByVal = async (data) => {
@@ -14,13 +14,22 @@ const addNewPatient = async (patient) => {
 const findPatientandupdate = async (data) => {
   return Patient.findOneAndUpdate(
     { email: data.email },
-    { otp: data.otp, otpExpires: data.otpExpires },
+    {
+      otp: data.otp,
+      otpExpires: data.otpExpires,
+      refreshToken: data.refreshToken,
+    },
     { new: true }
   );
 };
 
+const updatePatient = async (id, data) => {
+  return Patient.findOneAndUpdate({ _id: id }, data);
+};
+
 module.exports = {
   findPatientandupdate,
+  updatePatient,
   findPatientByVal,
   findPatient,
   addNewPatient,

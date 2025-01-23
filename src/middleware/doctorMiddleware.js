@@ -17,8 +17,7 @@ const authorizeDoctor = async (req, res, next) => {
 
     const { data } = tokenVarification(token);
     const user = await findDoctorById({ _id: data });
-    console.log(user);
-
+  
     if (!user) {
       return sendResponse(res, 404, "User not found.");
     }

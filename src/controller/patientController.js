@@ -3,6 +3,8 @@ const { tokenGeneration, tokenDecode } = require("../utils/token");
 const {
   addNewPatient,
   findPatientByVal,
+  findPatientandupdate,
+  updatePatient,
 } = require("../service/patientServices");
 const {
   addNewAppoinment,
@@ -23,10 +25,6 @@ const patientSignUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!email || !password) {
-      return res.redirect("/auth/google");
-    }
-
     if (email && password) {
       const alreadyExists = await findPatientByVal({ email });
       if (alreadyExists) {
@@ -44,6 +42,7 @@ const patientSignUp = async (req, res) => {
       await sendOTP(patient.email);
       return sendResponse(res, 201, "Account created successfully. OTP sent.");
     }
+    return sendResponse(res, 400, "Email and password required");
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -66,8 +65,16 @@ const validateOTP = async (req, res) => {
     if (patient.otp !== otp) {
       return sendResponse(res, 400, "Invalid OTP.");
     }
-    const token = await tokenGeneration(patient._id);
-    return sendResponse(res, 200, "OTP validated successfully.", { token });
+    const accessToken = tokenGeneration(patient._id, "1d");
+    const refreshToken = tokenGeneration(patient._id, "7d");
+
+    await updatePatient(patient._id, {
+      refreshToken,
+    });
+    return sendResponse(res, 200, "OTP validated successfully.", {
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     console.error("Error validating OTP:", error);
     return sendResponse(res, 500, "Server error.");
@@ -84,8 +91,16 @@ const paientLogin = async (req, res) => {
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    const token = tokenGeneration(user._id);
-    return sendResponse(res, 200, "Login successful", { token });
+    const accessToken = tokenGeneration(user._id, "1d");
+    const refreshToken = tokenGeneration(user._id, "7d");
+
+    await findPatientandupdate(user.email, {
+      refreshToken,
+    });
+    return sendResponse(res, 200, "Login successful", {
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");

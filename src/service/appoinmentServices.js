@@ -23,6 +23,7 @@ const addNewAppoinment = async (newAppointment) => {
 
 const findAppointment = async (data) => {
   return Appointment.find(data);
+
 };
 
 
