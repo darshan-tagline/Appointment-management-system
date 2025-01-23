@@ -24,10 +24,6 @@ const patientSchema = new mongoose.Schema({
     type: Date,
     required: false,
   },
-  refreshToken: {
-    type: String,
-    required: false,
-  },
 });
 
 const Patient = mongoose.model("Patient", patientSchema);
