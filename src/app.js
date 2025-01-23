@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const app = express();
+const cors = require("cors");
 const connectDB = require("../config/db");
 const passport = require("passport");
 const sendResponse = require("./utils/responseUtils");
@@ -8,6 +9,12 @@ const router = require("./routes/router");
 const passportUtils = require("./utils/passport");
 const session = require("express-session");
 
+app.use(cors(
+  {
+    origin: "*",
+    
+  }
+));
 connectDB();
 // createAdmin();
 const port = process.env.PORT || 3000;
