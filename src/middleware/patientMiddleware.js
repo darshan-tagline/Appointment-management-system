@@ -1,6 +1,6 @@
 const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
-const { findPatient } = require("../service/patientServices");
+const { findPatientByVal } = require("../service/patientServices");
 const passport = require("passport");
 
 const authorizePatient = async (req, res, next) => {
@@ -21,10 +21,10 @@ const authorizePatient = async (req, res, next) => {
     let user;
 
     try {
-       const decoded = await tokenVarification(token);
-      
+      const decoded = await tokenVarification(token);
+
       const { data: patientId } = decoded;
-      user = await findPatient({ _id: patientId });
+      user = await findPatientByVal({ _id: patientId });      
       if (!user) {
         return sendResponse(res, 404, "User not found.");
       }
@@ -34,13 +34,12 @@ const authorizePatient = async (req, res, next) => {
     }
 
     req.user = user;
-    next(); 
+    next();
   } catch (error) {
     console.error("Authorization error:", error);
     return sendResponse(res, 500, "Server error.");
   }
 };
-
 
 const googleAuth = passport.authenticate("google", {
   scope: ["openid", "profile", "email"],
@@ -51,8 +50,6 @@ const googleAuthCallback = (req, res) => {
     patient: req.user,
   });
 };
-
-
 
 module.exports = {
   authorizePatient,

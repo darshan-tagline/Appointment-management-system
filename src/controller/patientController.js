@@ -1,5 +1,5 @@
 const sendResponse = require("../utils/responseUtils");
-const { tokenGeneration, tokenDecode } = require("../utils/token");
+const { tokenGeneration } = require("../utils/token");
 const {
   addNewPatient,
   findPatientByVal,
@@ -157,8 +157,8 @@ const createAppointment = async (req, res) => {
 
 const getAppoinment = async (req, res) => {
   try {
-    const { id } = req.user.id;
-    const data = await findPatientByVal({ id });
+    const id = req.user._id;
+    const data = await findPatientByVal({ _id: id.toString() });
     if (!data) {
       return sendResponse(res, 404, "Patient not found");
     }
@@ -181,8 +181,8 @@ const getAppoinment = async (req, res) => {
 
 const viewCase = async (req, res) => {
   try {
-    const patientId = req.user.id;
-    const data = await findCasesByPatient({ patientId });
+    const patientId = req.user._id;
+    const data = await findCasesByPatient({ patientId: patientId.toString() });
     if (!data) {
       return sendResponse(res, 404, "Case not found");
     }
@@ -195,10 +195,14 @@ const viewCase = async (req, res) => {
 
 const addHearingRequest = async (req, res) => {
   try {
-    const patientEmail = req.user.email;
+    const patientId = req.user._id;
+    console.log(req.us);
+
     const { caseId, reason } = req.body;
 
-    const caseData = await findCasesByPatient({ patientEmail });
+    const caseData = await findCasesByPatient({
+      patientId: patientId.toString(),
+    });
     if (!caseData || caseData.length === 0) {
       return sendResponse(res, 404, "No cases found for the patient");
     }
@@ -225,6 +229,7 @@ const addHearingRequest = async (req, res) => {
     return sendResponse(res, 500, "Server error");
   }
 };
+
 const getHearing = async (req, res) => {
   try {
     const { id } = req.params;

@@ -18,8 +18,8 @@ const medicineSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-  { versionKey: false }
+    versionKey: false,
+  }
 );
 
 const Medicine = mongoose.model("Medicine", medicineSchema);

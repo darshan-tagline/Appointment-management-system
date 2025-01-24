@@ -6,13 +6,8 @@ const {
 } = require("../service/patientServices");
 const { tokenGeneration } = require("./token");
 
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
 
 passport.use(
   new GoogleStrategy(
@@ -24,34 +19,23 @@ passport.use(
       prompt: "consent",
       passReqToCallback: true,
     },
-    async (req, at, rt, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
-        const alreadyExists = await findPatientByVal({ email });
-        if (alreadyExists) {
-          return done(null, "User already exists");
-        }
 
         let patient = await findPatientByVal({ email });
-        if (!patient) {
-          const patientData = {
-            name: profile.displayName,
-            email,
-            password: null,
-            
-          };
-          patient = await addNewPatient(patientData);
+        if (patient) {
+          const token = tokenGeneration(patient._id, "1d");
+          return done(null, { ...patient.toObject(), accessToken: token });
         }
 
-        const accessToken = tokenGeneration(patient._id, "1d");
+        const newPatient = await addNewPatient({
+          name: profile.displayName,
+          email,
+        });
 
-        const userWithTokens = {
-          ...patient.toObject(),
-          accessToken,
-     
-        };
-
-        return done(null, userWithTokens);
+        const token = tokenGeneration(newPatient._id, "7d");
+        return done(null, { ...newPatient.toObject(), accessToken: token });
       } catch (error) {
         return done(error, null);
       }

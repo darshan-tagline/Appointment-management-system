@@ -24,8 +24,7 @@ const hearingRequestSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { versionKey: false },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const HearingRequest = mongoose.model("HearingRequest", hearingRequestSchema);

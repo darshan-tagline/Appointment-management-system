@@ -18,8 +18,7 @@ const caseSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { versionKey: false },
-  { timestamps: true }
+  { versionKey: false, timestamps: true }
 );
 
 const Case = mongoose.model("Case", caseSchema);

@@ -34,8 +34,7 @@ const hearingSchema = new mongoose.Schema(
       },
     ],
   },
-  { versionKey: false },
-  { timestamps: true }
+  { versionKey: false, timestamps: true }
 );
 
 const Hearing = mongoose.model("Hearing", hearingSchema);

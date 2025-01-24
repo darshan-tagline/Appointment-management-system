@@ -4,8 +4,6 @@ const addNewCase = async (caseData) => {
   return Case.create(caseData);
 };
 const findCasesByDoctor = async (data) => {
-  console.log(data);
-  
   const cases = await Case.find(data)
     .populate("patientId", "name email")
     .populate("appointmentId", "date time symptoms");
@@ -14,6 +12,7 @@ const findCasesByDoctor = async (data) => {
 };
 
 const findCasesByPatient = async (data) => {
+  
   const cases = await Case.find(data)
     .populate("doctorId", "name email")
     .populate("appointmentId", "date time symptoms");

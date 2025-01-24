@@ -1,4 +1,14 @@
-const { findDoctor } = require("../service/doctorServices");
+const { findCategory } = require("../service/categoryServices");
+const { passwordHash } = require("../utils/passwordUtils");
+const {
+  findDoctor,
+  addDoctor,
+  findAllDoctors,
+  findDoctorById,
+  modifyDoctor,
+  removeDoctor,
+  searchDoctor,
+} = require("../service/doctorServices");
 const sendResponse = require("../utils/responseUtils");
 const { tokenGeneration } = require("../utils/token");
 const {
@@ -17,6 +27,123 @@ const {
   updateHearingData,
 } = require("../service/hearingServices");
 const { createBill, findBill } = require("../service/billServices");
+const sendEmail = require("../utils/sendMail");
+
+const createDoctor = async (req, res) => {
+  try {
+    const { name, email, password, categoryId } = req.body;
+    const alreadyExist = await findDoctor({ email });
+    if (alreadyExist) {
+      return sendResponse(res, 400, "Doctor already exists");
+    }
+    const validCategory = await findCategory({ _id: categoryId });
+    if (!validCategory) {
+      return sendResponse(res, 400, "Category not found");
+    }
+    const hashedPassword = await passwordHash(password);
+    const doctorData = {
+      name,
+      email,
+      password: hashedPassword,
+      categoryId,
+    };
+    await addDoctor(doctorData);
+    const subject = "Welcome to the System - Your Login Details";
+    const textContent = `
+      Dear Dr. ${name},
+
+      Your account has been created.
+
+      Email: ${email}
+      Temporary Password: ${password}
+
+      Please log in and change your password immediately.
+
+      Best regards,
+      Your System Team
+    `;
+
+    await sendEmail(email, subject, textContent);
+
+    return sendResponse(res, 201, "Doctor created successfully");
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const getAllDoctors = async (req, res) => {
+  try {
+    const queryParams = req.query;
+    let doctors;
+
+    doctors = await searchDoctor(queryParams);
+    if (doctors.length === 0) {
+      return sendResponse(res, 404, "No doctors found with the given name");
+    }
+
+    return sendResponse(res, 200, "Doctors fetched successfully", doctors);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const getDoctorById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const doctor = await findDoctorById(id);
+    if (!doctor) {
+      return sendResponse(res, 404, "Doctor not found");
+    }
+    return sendResponse(res, 200, "Doctor fetched successfully", doctor);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+const updateDoctor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, categoryId, password } = req.body;
+    const validCategory = await findCategory({ _id: categoryId });
+    if (!validCategory) {
+      return sendResponse(res, 400, "Category not found");
+    }
+    const alreadyExist = await findDoctor({ email });
+    if (alreadyExist) {
+      return sendResponse(res, 400, "Doctor already exists");
+    }
+    const hashedPassword = await passwordHash(password);
+    const doctor = await modifyDoctor(id, {
+      name,
+      email,
+      categoryId,
+      password: hashedPassword,
+    });
+    if (!doctor) {
+      return sendResponse(res, 404, "Doctor not found");
+    }
+    return sendResponse(res, 200, "Doctor updated successfully", doctor);
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const deleteDoctor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const doctor = await removeDoctor(id);
+    if (!doctor) {
+      return sendResponse(res, 404, "Doctor not found");
+    }
+    return sendResponse(res, 200, "Doctor deleted successfully");
+  } catch (error) {
+    console.log("error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
 
 const doctorLogin = async (req, res) => {
   try {
@@ -188,7 +315,13 @@ const calculateTotalAmount = (hearing) => {
   const ratePerMedicine = 50;
   return medicineCount * ratePerMedicine;
 };
+
 module.exports = {
+  createDoctor,
+  getAllDoctors,
+  getDoctorById,
+  updateDoctor,
+  deleteDoctor,
   doctorLogin,
   updateAppointment,
   getAppointmentForDoctor,

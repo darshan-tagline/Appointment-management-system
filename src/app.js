@@ -32,12 +32,12 @@ app.use(passport.session());
 app.use("/api", router);
 
 app.use("*", (req, res) => {
-  sendResponse(res, 404, "Page not found");
+  return sendResponse(res, 404, "Page not found");
 });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  sendResponse(res, 500, err.message);
+  return sendResponse(res, 500, err.message);
 });
 
 app.listen(port, () =>

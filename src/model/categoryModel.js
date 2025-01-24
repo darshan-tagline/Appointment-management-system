@@ -16,12 +16,10 @@ const categorySchema = new mongoose.Schema(
       maxlength: [255, "Description cannot be longer than 255 characters"],
     },
   },
-  { versionKey: false },
-  {
-    timestamps: true,
-  }
+
+  { versionKey: false, timestamps: true }
 );
 
 const Category = mongoose.model("Category", categorySchema);
 
-module.exports =  Category ;
+module.exports = Category;

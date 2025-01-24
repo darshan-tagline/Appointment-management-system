@@ -1,19 +1,19 @@
 const express = require("express");
-const validate = require("../../middleware/validateMiddleware");
-const medicineValidatorSchema = require("../../validators/medicineValidation");
+const validate = require("../middleware/validateMiddleware");
+const medicineValidatorSchema = require("../validators/medicineValidation");
 const {
   addMedicine,
   getMedicineById,
   getAllMedicines,
   updateMedicine,
   deleteMedicine,
-} = require('../../controller/adminControllers/medicineController');
+} = require("../controller/medicineController");
 
 const medicineRouter = express.Router();
 
 medicineRouter.post("/", validate(medicineValidatorSchema), addMedicine);
-medicineRouter.get("/id/:id", getMedicineById);
-medicineRouter.get("/:name?", getAllMedicines);
+medicineRouter.get("/", getAllMedicines);
+medicineRouter.get("/:id", getMedicineById);
 medicineRouter.put("/:id", validate(medicineValidatorSchema), updateMedicine);
 medicineRouter.delete("/:id", deleteMedicine);
 

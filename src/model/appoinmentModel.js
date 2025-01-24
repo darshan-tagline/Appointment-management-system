@@ -16,10 +16,8 @@ const appointmentSchema = new mongoose.Schema(
     symptoms: { type: String },
     status: { type: String, default: "pending" },
   },
-  { versionKey: false },
-  { timestamps: true }
+  { versionKey: false, timestamps: true }
 );
-
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 

@@ -1,17 +1,18 @@
-const sendResponse = require("../../utils/responseUtils");
+const sendResponse = require("../utils/responseUtils");
 const {
   addNewCategory,
-  findAllcategories,
-  findCategoryById,
   removeCategory,
   modifyCategory,
   findCategory,
-} = require("../../service/categoryServices");
+  searchCategory,
+} = require("../service/categoryServices");
 
 const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
     const alreadyExist = await findCategory({ name });
+    console.log(alreadyExist);
+
     if (alreadyExist) {
       return sendResponse(res, 400, "Category already exists");
     }
@@ -25,27 +26,17 @@ const addCategory = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
   try {
-    const { name } = req.params;
+    const queryParams = req.query;
     let categories;
-    if (name) {
-      categories = await findCategory({ name });
-      if (!categories || categories.length === 0) {
-        return sendResponse(
-          res,
-          404,
-          "No categories found with the given name"
-        );
-      }
-    } else {
-      categories = await findAllcategories();
-    }
 
+    categories = await searchCategory(queryParams);
+    if (categories.length === 0) {
+      return sendResponse(res, 404, "No categories found with the given name");
+    }
     return sendResponse(
       res,
       200,
-      name
-        ? "Category fetched successfully"
-        : "Categories fetched successfully",
+      "Categories fetched successfully",
       categories
     );
   } catch (error) {
@@ -57,7 +48,7 @@ const getAllCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const category = await findCategoryById(id);
+    const category = await findCategory({ _id: id });
     if (!category) {
       return sendResponse(res, 404, "Category not found");
     }

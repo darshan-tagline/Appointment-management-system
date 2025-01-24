@@ -1,12 +1,11 @@
-const sendResponse = require("../../utils/responseUtils");
+const sendResponse = require("../utils/responseUtils");
 const {
   addNewMedicine,
-  findAllMedicines,
   findMedicine,
-  findMedicineById,
   removeMedicine,
   modifyMedicine,
-} = require("../../service/medicineServices");
+  searchMedicine,
+} = require("../service/medicineServices");
 
 const addMedicine = async (req, res) => {
   try {
@@ -25,23 +24,14 @@ const addMedicine = async (req, res) => {
 
 const getAllMedicines = async (req, res) => {
   try {
-    const { name } = req.params;
+    const queryParams = req.query;
     let medicines;
-    if (name) {
-      medicines = await findMedicine({ name });
-      if (!medicines || medicines.length === 0) {
-        return sendResponse(res, 404, "No medicines found with the given name");
-      }
-    } else {
-      medicines = await findAllMedicines();
+    medicines = await searchMedicine(queryParams);
+  
+    if (medicines.length === 0) {
+      return sendResponse(res, 404, "No medicines found with the given name");
     }
-
-    return sendResponse(
-      res,
-      200,
-      name ? "Medicine fetched successfully" : "Medicines fetched successfully",
-      medicines
-    );
+    return sendResponse(res, 200, "Medicines fetched successfully", medicines);
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -51,7 +41,7 @@ const getAllMedicines = async (req, res) => {
 const getMedicineById = async (req, res) => {
   try {
     const { id } = req.params;
-    const medicine = await findMedicineById(id);
+    const medicine = await findMedicine({ _id: id });
     if (!medicine) {
       return sendResponse(res, 404, "Medicine not found");
     }
