@@ -29,18 +29,7 @@ const modifyMedicine = async (id, medicine) => {
   );
 };
 
-const searchMedicines = async (data, skip, limit) => {
-  const isNumeric = !isNaN(data);
 
-  return Medicine.find({
-    $or: [
-      { name: { $regex: data, $options: "i" } },
-      ...(isNumeric ? [{ price: parseFloat(data) }] : []),
-    ],
-  })
-    .skip(skip)
-    .limit(limit);
-};
 
 module.exports = {
   findMedicine,
@@ -49,5 +38,5 @@ module.exports = {
   findMedicineById,
   removeMedicine,
   modifyMedicine,
-  searchMedicines,
+  
 };

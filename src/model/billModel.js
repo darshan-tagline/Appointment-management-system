@@ -17,6 +17,7 @@ const billSchema = new mongoose.Schema(
       required: true,
     },
   },
+  { versionKey: false },
   { timestamps: true }
 );
 const Bill = mongoose.model("Bill", billSchema);

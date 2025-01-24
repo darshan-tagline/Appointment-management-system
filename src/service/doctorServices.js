@@ -20,16 +20,7 @@ const removeDoctor = async (id) => {
   return Doctor.findByIdAndDelete(id);
 };
 
-const searchDoctor = async (data,skip,limit) => {
-  return Doctor.find({
-    $or: [
-      { name: { $regex: `^${data}`, $options: "i" } },
-      { email: { $regex: `^${data}`, $options: "i" } },
-    ],
-  })
-    .skip(skip)
-    .limit(limit);
-};
+
 
 const modifyDoctor = async (id, doctor) => {
   const { name, email, category, password } = doctor;
@@ -47,5 +38,5 @@ module.exports = {
   findAllDoctors,
   removeDoctor,
   modifyDoctor,
-  searchDoctor,
+  
 };

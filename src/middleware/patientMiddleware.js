@@ -1,4 +1,3 @@
-// const axios = require("axios");
 const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
 const { findPatient } = require("../service/patientServices");
@@ -53,21 +52,10 @@ const googleAuthCallback = (req, res) => {
   });
 };
 
-// const verifyGoogleAccessToken = async (accessToken) => {
-//   try {
-//     const response = await axios.get(
-//       `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error verifying access token:", error.response.data);
-//     throw new Error("Invalid or expired access token.");
-//   }
-// };
+
 
 module.exports = {
   authorizePatient,
   googleAuth,
   googleAuthCallback,
-  // verifyGoogleAccessToken,
 };

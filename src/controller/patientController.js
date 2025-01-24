@@ -36,6 +36,7 @@ const patientSignUp = async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        isVerified: false,
       };
       const patient = await addNewPatient(patientData);
 
@@ -52,7 +53,6 @@ const patientSignUp = async (req, res) => {
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-
     const patient = await findPatientByVal({ email });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
@@ -65,6 +65,12 @@ const validateOTP = async (req, res) => {
     if (patient.otp !== otp) {
       return sendResponse(res, 400, "Invalid OTP.");
     }
+    const verificationUpdate = {
+      isVerified: true,
+      otp: null,
+      otpExpires: null,
+    };
+    await updatePatient(patient._id, verificationUpdate);
     const accessToken = tokenGeneration(patient._id, "7d");
 
     return sendResponse(res, 200, "OTP validated successfully.", {
@@ -81,6 +87,13 @@ const paientLogin = async (req, res) => {
     const user = await findPatientByVal({ email });
     if (!user) {
       return sendResponse(res, 401, "Invalid email or password");
+    }
+    if (!user.isVerified) {
+      return sendResponse(
+        res,
+        401,
+        "Account not verified. Please verify your email."
+      );
     }
     const isPasswordMatch = await passwordCompare(password, user.password);
     if (!isPasswordMatch) {

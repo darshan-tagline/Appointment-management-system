@@ -1,3 +1,4 @@
+const { version } = require("joi");
 const mongoose = require("mongoose");
 
 const medicineSchema = new mongoose.Schema(
@@ -16,10 +17,11 @@ const medicineSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, 
-  }
+    timestamps: true,
+  },
+  { versionKey: false }
 );
 
-const Medicine = mongoose.model('Medicine', medicineSchema);
+const Medicine = mongoose.model("Medicine", medicineSchema);
 
-module.exports =  Medicine ;
+module.exports = Medicine;

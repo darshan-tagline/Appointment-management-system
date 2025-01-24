@@ -18,6 +18,7 @@ const caseSchema = new mongoose.Schema(
       required: true,
     },
   },
+  { versionKey: false },
   { timestamps: true }
 );
 

@@ -9,12 +9,12 @@ const router = require("./routes/router");
 const passportUtils = require("./utils/passport");
 const session = require("express-session");
 
-app.use(cors(
-  {
+app.use(
+  cors({
     origin: "*",
-    
-  }
-));
+    credentials: true,
+  })
+);
 connectDB();
 // createAdmin();
 const port = process.env.PORT || 3000;
@@ -40,4 +40,6 @@ app.use((err, req, res, next) => {
   sendResponse(res, 500, err.message);
 });
 
-app.listen(port, () => console.log(`Server is connected`));
+app.listen(port, () =>
+  console.log(`Servere connected successfully and port is ${port}`)
+);

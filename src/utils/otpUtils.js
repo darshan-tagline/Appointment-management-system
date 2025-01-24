@@ -17,7 +17,6 @@ const sendOTP = async (email) => {
       otp,
       otpExpires,
     });
-      
 
     await sendEmail(
       patient.email,

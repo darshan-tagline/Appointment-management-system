@@ -7,6 +7,7 @@ const patientValidatorSchema = Joi.object({
     "any.required": "Name is required.",
   }),
 
+
   email: Joi.string()
     .pattern(/^[^\s@]+@[^\s@]+\.[a-z]{2,7}$/)
     .required()

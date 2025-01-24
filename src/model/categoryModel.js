@@ -16,6 +16,7 @@ const categorySchema = new mongoose.Schema(
       maxlength: [255, "Description cannot be longer than 255 characters"],
     },
   },
+  { versionKey: false },
   {
     timestamps: true,
   }

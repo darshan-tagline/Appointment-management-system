@@ -1,30 +1,36 @@
 const mongoose = require("mongoose");
-
-const patientSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
+const patientSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      minlength: 6,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otp: {
+      type: String,
+      required: false,
+    },
+    otpExpires: {
+      type: Date,
+      required: false,
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-  password: {
-    type: String,
-    minlength: 6,
-  },
-  otp: {
-    type: String,
-    required: false,
-  },
-  otpExpires: {
-    type: Date,
-    required: false,
-  },
-});
+  { versionKey: false }
+);
 
 const Patient = mongoose.model("Patient", patientSchema);
 module.exports = Patient;
