@@ -24,6 +24,7 @@ const authorizePatient = async (req, res, next) => {
       const decoded = await tokenVarification(token);
 
       const { data: patientId } = decoded;
+      
       user = await findPatientByVal({ _id: patientId });      
       if (!user) {
         return sendResponse(res, 404, "User not found.");

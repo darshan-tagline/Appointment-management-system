@@ -1,6 +1,6 @@
 const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
-const { findDoctorById } = require("../service/doctorServices");
+const { findDoctor} = require("../service/doctorServices");
 
 const authorizeDoctor = async (req, res, next) => {
   try {
@@ -15,9 +15,9 @@ const authorizeDoctor = async (req, res, next) => {
       return sendResponse(res, 403, "Access denied. No token provided.");
     }
 
-    const { data } = tokenVarification(token);
-    const user = await findDoctorById({ _id: data });
-  
+    const { data } = tokenVarification(token);   
+    const user = await findDoctor({ _id: data });
+
     if (!user) {
       return sendResponse(res, 404, "User not found.");
     }

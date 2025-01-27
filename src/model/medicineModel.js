@@ -1,19 +1,16 @@
-const { version } = require("joi");
 const mongoose = require("mongoose");
 
 const medicineSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
       unique: true,
-      trim: true,
-      minlength: 3,
+      required: true,
+      lowercase: true,
     },
     price: {
       type: Number,
       required: true,
-      min: 0,
     },
   },
   {

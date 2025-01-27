@@ -1,6 +1,9 @@
 const express = require("express");
 const validate = require("../middleware/validateMiddleware");
-const medicineValidatorSchema = require("../validators/medicineValidation");
+const {
+  medicineValidatorSchema,
+  medicineUpdateValidatorSchema,
+} = require("../validators/medicineValidation");
 const {
   addMedicine,
   getMedicineById,
@@ -14,7 +17,11 @@ const medicineRouter = express.Router();
 medicineRouter.post("/", validate(medicineValidatorSchema), addMedicine);
 medicineRouter.get("/", getAllMedicines);
 medicineRouter.get("/:id", getMedicineById);
-medicineRouter.put("/:id", validate(medicineValidatorSchema), updateMedicine);
+medicineRouter.put(
+  "/:id",
+  validate(medicineUpdateValidatorSchema),
+  updateMedicine
+);
 medicineRouter.delete("/:id", deleteMedicine);
 
 module.exports = medicineRouter;

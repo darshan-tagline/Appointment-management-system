@@ -12,8 +12,7 @@ const sendOTP = async (email) => {
     const otpExpires = new Date();
     otpExpires.setMinutes(otpExpires.getMinutes() + 10);
 
-    const patient = await findPatientandupdate({
-      email,
+    const patient = await findPatientandupdate(email, {
       otp,
       otpExpires,
     });

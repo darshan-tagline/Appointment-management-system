@@ -41,16 +41,30 @@ const appointmentValidatorSchema = Joi.object({
       "string.empty": "Time slot cannot be empty.",
       "any.required": "Time slot is required.",
     }),
-  symptoms: Joi.string().optional().messages({
-    "string.empty": "Symptoms cannot be an empty string.",
-  }),
+  symptoms: Joi.string().optional(),
   status: Joi.string()
     .valid("pending", "approved", "rejected")
     .optional()
+    .lowercase()
+    .default("pending")
     .messages({
       "string.empty": "Status cannot be an empty string.",
       "any.only": "Status must be one of 'pending', 'approved', or 'rejected'.",
     }),
 });
 
-module.exports = appointmentValidatorSchema;
+const appointmentUpdateValidatorSchema = Joi.object({
+  status: Joi.string()
+    .valid("approved", "rejected")
+    .required()
+    .lowercase()
+    .messages({
+      "string.empty": "Status cannot be an empty string.",
+      "any.only": "Status must be either 'approved', or 'rejected'.",
+    }),
+});
+
+module.exports = {
+  appointmentValidatorSchema,
+  appointmentUpdateValidatorSchema,
+};

@@ -6,8 +6,6 @@ const patientValidatorSchema = Joi.object({
     "string.min": "Name must be at least 3 characters long.",
     "any.required": "Name is required.",
   }),
-
-
   email: Joi.string()
     .pattern(/^[^\s@]+@[^\s@]+\.[a-z]{2,7}$/)
     .required()

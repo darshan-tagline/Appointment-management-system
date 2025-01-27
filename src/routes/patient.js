@@ -16,7 +16,9 @@ const {
   googleAuthCallback,
 } = require("../middleware/patientMiddleware");
 const patientValidatorSchema = require("../validators/patientValidation");
-const appointmentValidatorSchema = require("../validators/appoinmentValidation");
+const {
+  appointmentValidatorSchema,
+} = require("../validators/appoinmentValidation");
 const hearingRequestValidatorSchema = require("../validators/hearingRequestValidation");
 const passport = require("passport");
 const patientRouter = express.Router();

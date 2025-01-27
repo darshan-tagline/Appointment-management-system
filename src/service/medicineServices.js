@@ -8,10 +8,6 @@ const addNewMedicine = async (data) => {
   return Medicine.create(data);
 };
 
-const findAllMedicines = async () => {
-  return Medicine.find();
-};
-
 const removeMedicine = async (id) => {
   return Medicine.findByIdAndDelete(id);
 };
@@ -49,7 +45,6 @@ const searchMedicine = async (data) => {
 module.exports = {
   findMedicine,
   addNewMedicine,
-  findAllMedicines,
   removeMedicine,
   searchMedicine,
   modifyMedicine,

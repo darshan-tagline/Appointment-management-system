@@ -1,6 +1,9 @@
 const express = require("express");
 const validate = require("../middleware/validateMiddleware");
-const categoryValidatorSchema = require("../validators/categoryValidation");
+const {
+  categoryValidatorSchema,
+  categoryUpdateValidatorSchema,
+} = require("../validators/categoryValidation");
 const {
   addCategory,
   getCategoryById,
@@ -13,7 +16,11 @@ const categoryRouter = express.Router();
 categoryRouter.post("/", validate(categoryValidatorSchema), addCategory);
 categoryRouter.get("/", getAllCategories);
 categoryRouter.get("/:id", getCategoryById);
-categoryRouter.put("/:id", updateCategory);
+categoryRouter.put(
+  "/:id",
+  validate(categoryUpdateValidatorSchema),
+  updateCategory
+);
 categoryRouter.delete("/:id", deleteCategory);
 
 module.exports = categoryRouter;

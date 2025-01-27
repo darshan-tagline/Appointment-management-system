@@ -27,7 +27,7 @@ const getAllMedicines = async (req, res) => {
     const queryParams = req.query;
     let medicines;
     medicines = await searchMedicine(queryParams);
-  
+
     if (medicines.length === 0) {
       return sendResponse(res, 404, "No medicines found with the given name");
     }
@@ -56,7 +56,7 @@ const updateMedicine = async (req, res) => {
     const { id } = req.params;
     const { name, price } = req.body;
     const alreadyExist = await findMedicine({ name });
-    if (alreadyExist) {
+    if (alreadyExist && alreadyExist._id.toString() !== id) {
       return sendResponse(res, 400, "Medicine already exists");
     }
     const updatedMedicine = await modifyMedicine(id, {

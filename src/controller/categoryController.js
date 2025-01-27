@@ -64,8 +64,8 @@ const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name, description } = req.body;
     const alreadyExist = await findCategory({ name });
-    if (alreadyExist) {
-      return sendResponse(res, 400, "Category already exists");
+    if (alreadyExist && alreadyExist._id.toString() !== id) {
+      return sendResponse(res, 400, "Category name already exists");
     }
     const updatedCategory = await modifyCategory(id, {
       name,

@@ -3,8 +3,6 @@ const { passwordHash } = require("../utils/passwordUtils");
 const {
   findDoctor,
   addDoctor,
-  findAllDoctors,
-  findDoctorById,
   modifyDoctor,
   removeDoctor,
   searchDoctor,
@@ -28,6 +26,7 @@ const {
 } = require("../service/hearingServices");
 const { createBill, findBill } = require("../service/billServices");
 const sendEmail = require("../utils/sendMail");
+const { findMedicine } = require("../service/medicineServices");
 
 const createDoctor = async (req, res) => {
   try {
@@ -81,7 +80,6 @@ const getAllDoctors = async (req, res) => {
     if (doctors.length === 0) {
       return sendResponse(res, 404, "No doctors found with the given name");
     }
-
     return sendResponse(res, 200, "Doctors fetched successfully", doctors);
   } catch (error) {
     console.log("error", error);
@@ -92,7 +90,7 @@ const getAllDoctors = async (req, res) => {
 const getDoctorById = async (req, res) => {
   try {
     const { id } = req.params;
-    const doctor = await findDoctorById(id);
+    const doctor = await findDoctor({ _id: id });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -104,26 +102,33 @@ const getDoctorById = async (req, res) => {
 };
 const updateDoctor = async (req, res) => {
   try {
+    let newPassword = null;
     const { id } = req.params;
     const { name, email, categoryId, password } = req.body;
-    const validCategory = await findCategory({ _id: categoryId });
-    if (!validCategory) {
-      return sendResponse(res, 400, "Category not found");
+    const doctorData = await findDoctor({ _id: id });
+    if (!doctorData) {
+      return sendResponse(res, 404, "Doctor not found");
+    }
+    if (categoryId) {
+      const validCategory = await findCategory({ _id: categoryId });
+      if (!validCategory) {
+        return sendResponse(res, 400, "Category not found");
+      }
     }
     const alreadyExist = await findDoctor({ email });
-    if (alreadyExist) {
+    if (alreadyExist && alreadyExist._id.toString() !== id) {
       return sendResponse(res, 400, "Doctor already exists");
     }
-    const hashedPassword = await passwordHash(password);
+    if (password) {
+      newPassword = await passwordHash(password);
+    }
+
     const doctor = await modifyDoctor(id, {
       name,
       email,
       categoryId,
-      password: hashedPassword,
+      password: newPassword ? newPassword : doctorData.password,
     });
-    if (!doctor) {
-      return sendResponse(res, 404, "Doctor not found");
-    }
     return sendResponse(res, 200, "Doctor updated successfully", doctor);
   } catch (error) {
     console.log("error", error);
@@ -191,6 +196,9 @@ const updateAppointment = async (req, res) => {
     if (!appointment) {
       return sendResponse(res, 404, "Appointment not found");
     }
+    if (status === "rejected") {
+      return sendResponse(res, 200, "Appointment is rejected", appointment);
+    }
     const existingCase = await findCase({ appointmentId: id });
     if (existingCase) {
       return sendResponse(
@@ -235,6 +243,10 @@ const getCase = async (req, res) => {
 const addHearing = async (req, res) => {
   try {
     const { caseId, description, prescription } = req.body;
+    const validCase = await findCase({ _id: caseId });
+    if (!validCase) {
+      return sendResponse(res, 400, `case does not exist in the database.`);
+    }
 
     const existingCase = await findHearing({ caseId });
     if (existingCase) {
@@ -244,14 +256,22 @@ const addHearing = async (req, res) => {
         "Hearing for this case already exists in the database."
       );
     }
-
-    const newHearingData = {
+    for (let i = 0; i < prescription.length; i++) {
+      const medicine = prescription[i];
+      const validMedicine = await findMedicine({ _id: medicine.medicineId });
+      if (!validMedicine) {
+        return sendResponse(
+          res,
+          400,
+          `Medicine does not exist in the database.`
+        );
+      }
+    }
+    const newHearing = await addNewHearing({
       caseId,
       description,
       prescription,
-    };
-
-    const newHearing = await addNewHearing(newHearingData);
+    });
 
     return sendResponse(res, 201, "Hearing added successfully", newHearing);
   } catch (error) {
@@ -283,7 +303,7 @@ const updateHearing = async (req, res) => {
     if (!hearing) {
       return sendResponse(res, 404, "Hearing not found");
     }
-    if (/^resolved$/i.test(hearing.status)) {
+    if (hearing.status === "resolved") {
       const existingBill = await findBill({ hearingId: id });
 
       if (existingBill) {
@@ -294,7 +314,7 @@ const updateHearing = async (req, res) => {
         );
       }
       const caseId = hearing.caseId._id;
-      const totalAmount = calculateTotalAmount(hearing);
+      const totalAmount = await calculateTotalAmount(hearing);
 
       const bill = await createBill(caseId, hearing._id, totalAmount);
 
@@ -310,10 +330,29 @@ const updateHearing = async (req, res) => {
   }
 };
 
-const calculateTotalAmount = (hearing) => {
-  const medicineCount = hearing.prescription.length;
-  const ratePerMedicine = 50;
-  return medicineCount * ratePerMedicine;
+const calculateTotalAmount = async (hearing) => {
+  try {
+    const doctorFee = 100;
+    let totalMedicineCost = 0;
+    for (let i = 0; i < hearing.prescription.length; i++) {
+      const medicine = hearing.prescription[i];
+
+      const medicineDetails = await findMedicine(medicine.medicineId);
+
+      if (!medicineDetails) {
+        throw new Error(`Medicine not found`);
+      }
+
+      totalMedicineCost += medicineDetails.price;
+    }
+
+    const totalAmount = totalMedicineCost + doctorFee;
+
+    return totalAmount;
+  } catch (error) {
+    console.error("Error ", error);
+    return sendResponse(res, 500, "Server error");
+  }
 };
 
 module.exports = {

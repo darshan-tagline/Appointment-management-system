@@ -3,7 +3,6 @@ const { tokenGeneration } = require("../utils/token");
 const {
   addNewPatient,
   findPatientByVal,
-  findPatientandupdate,
   updatePatient,
 } = require("../service/patientServices");
 const {
@@ -70,7 +69,7 @@ const validateOTP = async (req, res) => {
       otp: null,
       otpExpires: null,
     };
-    await updatePatient(patient._id, verificationUpdate);
+    await updatePatient(email, verificationUpdate);
     const accessToken = tokenGeneration(patient._id, "7d");
 
     return sendResponse(res, 200, "OTP validated successfully.", {
@@ -88,7 +87,7 @@ const paientLogin = async (req, res) => {
     if (!user) {
       return sendResponse(res, 401, "Invalid email or password");
     }
-    if (!user.isVerified) {
+    if (user.isVerified == false) {
       return sendResponse(
         res,
         401,
@@ -118,7 +117,6 @@ const createAppointment = async (req, res) => {
     if (!token) {
       return sendResponse(res, 401, "Authorization token is missing");
     }
-
     const checkBooking = {
       patientId: data,
       doctorId,

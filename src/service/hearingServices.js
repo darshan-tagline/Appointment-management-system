@@ -1,6 +1,7 @@
 const Hearing = require("../model/hearingModel");
 
 const addNewHearing = async (hearingData) => {
+  
   return Hearing.create(hearingData);
 };
 

@@ -4,9 +4,6 @@ const findCategory = async (data) => {
   return Category.findOne(data);
 };
 
-const findAllcategories = async () => {
-  return Category.find();
-};
 const addNewCategory = async (category) => {
   return Category.create(category);
 };
@@ -44,7 +41,6 @@ const searchCategory = async (data) => {
 module.exports = {
   findCategory,
   addNewCategory,
-  findAllcategories,
   removeCategory,
   modifyCategory,
   searchCategory,

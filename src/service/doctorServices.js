@@ -1,15 +1,11 @@
 const Doctor = require("../model/doctorModel");
 
-const findDoctor = async (data) => {
+const findDoctor = async (data) => { 
   return Doctor.findOne(data);
 };
 
 const addDoctor = async (doctorData) => {
   return Doctor.create(doctorData);
-};
-
-const findAllDoctors = async () => {
-  return Doctor.find();
 };
 
 const removeDoctor = async (id) => {
@@ -23,6 +19,9 @@ const modifyDoctor = async (id, doctor) => {
   });
 };
 
+const findDoctorById = async (id) => {
+  return Doctor.findById(id);
+};
 const searchDoctor = async (data) => {
   const query = {};
   const page = Number(data.page) || 1;
@@ -49,7 +48,7 @@ module.exports = {
   findDoctor,
   addDoctor,
   searchDoctor,
-  findAllDoctors,
+  findDoctorById,
   removeDoctor,
   modifyDoctor,
 };

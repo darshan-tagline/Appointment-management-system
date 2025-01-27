@@ -26,7 +26,6 @@ const findAppointment = async (data) => {
 
 };
 
-
 const updateStatus = async (id, status) => {
   return Appointment.findOneAndUpdate({ _id: id }, { status }, { new: true });
 };

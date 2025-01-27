@@ -5,8 +5,7 @@ const hearingValidatorSchema = Joi.object({
     "string.pattern.base": "Case ID must be a valid ObjectId.",
     "any.required": "Case ID is required.",
   }),
-  description: Joi.string().min(3).required().messages({
-    "string.empty": "Description is required.",
+  description: Joi.string().optional().min(3).messages({
     "string.min": "Description must be at least 3 characters long.",
   }),
   status: Joi.string()
@@ -40,4 +39,10 @@ const hearingValidatorSchema = Joi.object({
     }),
 });
 
-module.exports = hearingValidatorSchema;
+const hearingUpdateValidatorSchema = Joi.object({
+  status: Joi.string().valid("resolved", "In Progress").required().messages({
+    "string.valid": "Status must be either 'resolved' or 'In Progress'.",
+  }),
+});
+
+module.exports = { hearingValidatorSchema, hearingUpdateValidatorSchema };
