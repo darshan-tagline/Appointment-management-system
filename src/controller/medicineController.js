@@ -17,7 +17,7 @@ const addMedicine = async (req, res) => {
     await addNewMedicine({ name, price });
     return sendResponse(res, 201, "Medicine added successfully");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -33,7 +33,7 @@ const getAllMedicines = async (req, res) => {
     }
     return sendResponse(res, 200, "Medicines fetched successfully", medicines);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -47,7 +47,7 @@ const getMedicineById = async (req, res) => {
     }
     return sendResponse(res, 200, "Medicine fetched successfully", medicine);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -75,7 +75,7 @@ const updateMedicine = async (req, res) => {
       updatedMedicine
     );
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -89,7 +89,7 @@ const deleteMedicine = async (req, res) => {
     }
     return sendResponse(res, 200, "Medicine deleted successfully");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };

@@ -7,6 +7,8 @@ const {
   addHearing,
   updateHearing,
   getHearing,
+  getHearingRequests,
+  updateHearingStatus,
 } = require("../controller/doctorController");
 const authorizeDoctor = require("../middleware/doctorMiddleware");
 const validate = require("../middleware/validateMiddleware");
@@ -28,6 +30,9 @@ const {
 const {
   appointmentUpdateValidatorSchema,
 } = require("../validators/appoinmentValidation");
+const {
+  hearingRequestUpdateValidatorSchema,
+} = require("../validators/hearingRequestValidation");
 
 const adminDoctorRouter = express.Router();
 const doctorRouter = express.Router();
@@ -65,5 +70,12 @@ doctorRouter.put(
   updateHearing
 );
 
+doctorRouter.get("/hearingrequests", authorizeDoctor, getHearingRequests);
+doctorRouter.put(
+  "/hearingrequest/:id",
+  authorizeDoctor,
+  validate(hearingRequestUpdateValidatorSchema),
+  updateHearingStatus
+);
 
 module.exports = { adminDoctorRouter, doctorRouter };

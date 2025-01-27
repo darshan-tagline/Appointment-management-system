@@ -27,6 +27,11 @@ const {
 const { createBill, findBill } = require("../service/billServices");
 const sendEmail = require("../utils/sendMail");
 const { findMedicine } = require("../service/medicineServices");
+const {
+  findHearingRequest,
+  getAllHearingRequest,
+  updateHearingRequest,
+} = require("../service/hearingRequestServices");
 
 const createDoctor = async (req, res) => {
   try {
@@ -66,7 +71,7 @@ const createDoctor = async (req, res) => {
 
     return sendResponse(res, 201, "Doctor created successfully");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -82,7 +87,7 @@ const getAllDoctors = async (req, res) => {
     }
     return sendResponse(res, 200, "Doctors fetched successfully", doctors);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -96,7 +101,7 @@ const getDoctorById = async (req, res) => {
     }
     return sendResponse(res, 200, "Doctor fetched successfully", doctor);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -131,7 +136,7 @@ const updateDoctor = async (req, res) => {
     });
     return sendResponse(res, 200, "Doctor updated successfully", doctor);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -145,7 +150,7 @@ const deleteDoctor = async (req, res) => {
     }
     return sendResponse(res, 200, "Doctor deleted successfully");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -164,7 +169,7 @@ const doctorLogin = async (req, res) => {
     const token = tokenGeneration(doctor._id);
     return sendResponse(res, 200, "Login successful", { token });
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -183,7 +188,7 @@ const getAppointmentForDoctor = async (req, res) => {
       appointments
     );
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -222,7 +227,7 @@ const updateAppointment = async (req, res) => {
       { appointment, caseCreated }
     );
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -235,7 +240,7 @@ const getCase = async (req, res) => {
     }
     return sendResponse(res, 200, "Case fetched successfully", data);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -289,7 +294,7 @@ const getHearing = async (req, res) => {
     }
     return sendResponse(res, 200, "Hearing fetched successfully", data);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -325,15 +330,16 @@ const updateHearing = async (req, res) => {
     }
     return sendResponse(res, 200, "Hearing updated successfully", hearing);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
 
-const calculateTotalAmount = async (hearing) => {
+const calculateTotalAmount = async (hearing, res) => {
   try {
     const doctorFee = 100;
     let totalMedicineCost = 0;
+
     for (let i = 0; i < hearing.prescription.length; i++) {
       const medicine = hearing.prescription[i];
 
@@ -343,18 +349,56 @@ const calculateTotalAmount = async (hearing) => {
         throw new Error(`Medicine not found`);
       }
 
-      totalMedicineCost += medicineDetails.price;
+      totalMedicineCost += medicineDetails.price * medicine.quantity;
     }
 
     const totalAmount = totalMedicineCost + doctorFee;
 
     return totalAmount;
   } catch (error) {
-    console.error("Error ", error);
+    console.error("Error calculating total amount:", error);
     return sendResponse(res, 500, "Server error");
   }
 };
 
+const getHearingRequests = async (req, res) => {
+  try {
+    const doctorId = req.user._id;
+    const cases = await findCasesByDoctor({ doctorId });
+    const caseIds = cases.map((caseItem) => caseItem._id);
+    const data = await getAllHearingRequest({ caseId: { $in: caseIds } });
+    if (!data) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+    return sendResponse(res, 200, "Hearing fetched successfully", data);
+  } catch (error) {
+    console.log("Server Error", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const updateHearingStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const hearingRequest = await findHearingRequest({ _id: id });
+    if (!hearingRequest) {
+      return sendResponse(res, 404, "Hearing request not found");
+    }
+    const updatedHearingRequest = await updateHearingRequest(id, { status });
+
+    return sendResponse(
+      res,
+      200,
+      "Hearing status updated successfully",
+      updatedHearingRequest
+    );
+  } catch (error) {
+    console.error("Error updating hearing status:", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
 module.exports = {
   createDoctor,
   getAllDoctors,
@@ -368,4 +412,6 @@ module.exports = {
   getHearing,
   addHearing,
   updateHearing,
+  getHearingRequests,
+  updateHearingStatus,
 };

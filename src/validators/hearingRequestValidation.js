@@ -7,7 +7,19 @@ const hearingRequestValidatorSchema = Joi.object({
     "any.required": "Patient ID is required.",
   }),
   reason: Joi.string().required().trim(),
-  status: Joi.string().valid("open", "closed", "pending").default("pending"),
+  status: Joi.string()
+    .valid("approved", "rejected", "pending", "completed")
+    .default("pending"),
 });
 
-module.exports = hearingRequestValidatorSchema;
+const hearingRequestUpdateValidatorSchema = Joi.object({
+  status: Joi.string()
+    .required()
+    .valid("approved", "rejected", "pending", "completed")
+    .default("pending"),
+});
+
+module.exports = {
+  hearingRequestValidatorSchema,
+  hearingRequestUpdateValidatorSchema,
+};

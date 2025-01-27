@@ -19,7 +19,9 @@ const patientValidatorSchema = require("../validators/patientValidation");
 const {
   appointmentValidatorSchema,
 } = require("../validators/appoinmentValidation");
-const hearingRequestValidatorSchema = require("../validators/hearingRequestValidation");
+const {
+  hearingRequestValidatorSchema,
+} = require("../validators/hearingRequestValidation");
 const passport = require("passport");
 const patientRouter = express.Router();
 
@@ -43,7 +45,7 @@ patientRouter.post(
 );
 patientRouter.get("/appoinment", authorizePatient, getAppoinment);
 patientRouter.get("/case", authorizePatient, viewCase);
-patientRouter.get("/hearingrequest/:id", authorizePatient, getHearing);
+patientRouter.get("/hearingrequest", authorizePatient, getHearing);
 patientRouter.post(
   "/hearingrequest",
   authorizePatient,

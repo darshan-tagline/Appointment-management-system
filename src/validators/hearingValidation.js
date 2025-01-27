@@ -21,9 +21,10 @@ const hearingValidatorSchema = Joi.object({
           "string.pattern.base": "Medicine ID must be a valid ObjectId.",
           "any.required": "Medicine ID is required.",
         }),
-        dosage: Joi.string().min(1).required().messages({
-          "string.empty": "Dosage is required.",
-          "string.min": "Dosage must be at least 1 character long.",
+        quantity: Joi.number().min(1).required().messages({
+          "number.base": "Quantity must be a number.",
+          "number.min": "Quantity must be at least 1.",
+          "any.required": "Quantity is required.",
         }),
         duration: Joi.string().min(1).required().messages({
           "string.empty": "Duration is required.",

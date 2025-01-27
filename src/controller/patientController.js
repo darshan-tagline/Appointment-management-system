@@ -40,7 +40,7 @@ const patientSignUp = async (req, res) => {
     await sendOTP(patient.email);
     return sendResponse(res, 201, "OTP sent successfully.");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -103,7 +103,7 @@ const paientLogin = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -170,21 +170,21 @@ const getAppoinment = async (req, res) => {
       appointments
     );
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
 
 const viewCase = async (req, res) => {
   try {
-    const patientId = req.user._id;   
+    const patientId = req.user._id;
     const data = await findCasesByPatient({ patientId: patientId.toString() });
     if (!data) {
       return sendResponse(res, 404, "Case not found");
     }
     return sendResponse(res, 200, "Case fetched successfully", data);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -202,7 +202,9 @@ const addHearingRequest = async (req, res) => {
     }
 
     const alreadyExists = await findHearingRequest({ caseId });
-    if (alreadyExists.length > 0) {
+    console.log(alreadyExists);
+
+    if (alreadyExists) {
       return sendResponse(res, 400, "Hearing request already exists");
     }
 
@@ -226,15 +228,15 @@ const addHearingRequest = async (req, res) => {
 
 const getHearing = async (req, res) => {
   try {
-    const { id } = req.params;
-    const data = await findHearingRequest({ _id: id });
+    const patientId = req.user._id;
+    const data = await findHearingRequest({ patientId });
 
     if (!data) {
       return sendResponse(res, 404, "Hearing not found");
     }
     return sendResponse(res, 200, "Hearing fetched successfully", data);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };

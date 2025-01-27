@@ -17,7 +17,7 @@ const addCategory = async (req, res) => {
     await addNewCategory({ name, description });
     return sendResponse(res, 201, "Category created successfully");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -38,7 +38,7 @@ const getAllCategories = async (req, res) => {
       categories
     );
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -52,7 +52,7 @@ const getCategoryById = async (req, res) => {
     }
     return sendResponse(res, 200, "Category fetched successfully", category);
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -94,7 +94,7 @@ const deleteCategory = async (req, res) => {
     }
     return sendResponse(res, 200, "Category deleted successfully");
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };

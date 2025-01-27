@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const hearingRequestSchema = new mongoose.Schema(
   {
     caseId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Case",
       required: true,
-      unique: true,
     },
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +19,7 @@ const hearingRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["open", "closed", "pending"],
+      enum: ["approved", "rejected", "pending", "completed"],
       default: "pending",
       required: true,
     },

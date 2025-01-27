@@ -23,8 +23,8 @@ const hearingSchema = new mongoose.Schema(
           ref: "Medicine",
           required: true,
         },
-        dosage: {
-          type: String,
+        quantity: {
+          type: Number,
           required: true,
         },
         duration: {

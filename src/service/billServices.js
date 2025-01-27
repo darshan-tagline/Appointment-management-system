@@ -10,7 +10,7 @@ const createBill = async (caseId, hearingId, totalAmount) => {
     await newBill.save();
     return newBill;
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
 
     throw new Error("Error creating bill");
   }
