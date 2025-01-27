@@ -1,4 +1,6 @@
-const { findPatientandupdate } = require("../service/patientServices");
+const {
+  findAndUpdatePatient,
+} = require("../service/patientServices");
 
 const sendEmail = require("./sendMail");
 
@@ -12,10 +14,13 @@ const sendOTP = async (email) => {
     const otpExpires = new Date();
     otpExpires.setMinutes(otpExpires.getMinutes() + 10);
 
-    const patient = await findPatientandupdate(email, {
-      otp,
-      otpExpires,
-    });
+    const patient = await findAndUpdatePatient(
+      { email },
+      {
+        otp,
+        otpExpires,
+      }
+    );
 
     await sendEmail(
       patient.email,

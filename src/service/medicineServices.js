@@ -13,7 +13,6 @@ const removeMedicine = async (id) => {
 };
 
 const modifyMedicine = async (id, medicine) => {
-  const { name, price } = medicine;
   return Medicine.findByIdAndUpdate(id, medicine, {
     new: true,
     runValidators: true,

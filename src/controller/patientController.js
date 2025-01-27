@@ -3,7 +3,7 @@ const { tokenGeneration } = require("../utils/token");
 const {
   addNewPatient,
   findPatientByVal,
-  updatePatient,
+  findAndUpdatePatient,
 } = require("../service/patientServices");
 const {
   addNewAppoinment,
@@ -23,26 +23,22 @@ const { sendOTP } = require("../utils/otpUtils");
 const patientSignUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    if (email && password) {
-      const alreadyExists = await findPatientByVal({ email });
-      if (alreadyExists) {
-        return sendResponse(res, 400, "Patient already exists");
-      }
-
-      const hashedPassword = await passwordHash(password);
-      const patientData = {
-        name,
-        email,
-        password: hashedPassword,
-        isVerified: false,
-      };
-      const patient = await addNewPatient(patientData);
-
-      await sendOTP(patient.email);
-      return sendResponse(res, 201, "Account created successfully. OTP sent.");
+    const alreadyExists = await findPatientByVal({ email });
+    if (alreadyExists) {
+      return sendResponse(res, 400, "Patient already exists");
     }
-    return sendResponse(res, 400, "Email and password required");
+
+    const hashedPassword = await passwordHash(password);
+    const patientData = {
+      name,
+      email,
+      password: hashedPassword,
+      isVerified: false,
+    };
+    const patient = await addNewPatient(patientData);
+
+    await sendOTP(patient.email);
+    return sendResponse(res, 201, "OTP sent successfully.");
   } catch (error) {
     console.log("error", error);
     return sendResponse(res, 500, "Server error");
@@ -64,12 +60,15 @@ const validateOTP = async (req, res) => {
     if (patient.otp !== otp) {
       return sendResponse(res, 400, "Invalid OTP.");
     }
-    const verificationUpdate = {
-      isVerified: true,
-      otp: null,
-      otpExpires: null,
-    };
-    await updatePatient(email, verificationUpdate);
+
+    await findAndUpdatePatient(
+      { email },
+      {
+        isVerified: true,
+        otp: null,
+        otpExpires: null,
+      }
+    );
     const accessToken = tokenGeneration(patient._id, "7d");
 
     return sendResponse(res, 200, "OTP validated successfully.", {
@@ -117,18 +116,17 @@ const createAppointment = async (req, res) => {
     if (!token) {
       return sendResponse(res, 401, "Authorization token is missing");
     }
-    const checkBooking = {
+    const validDoctorId = await findDoctor({ _id: doctorId });
+    if (!validDoctorId) {
+      return sendResponse(res, 400, "Doctor not found");
+    }
+    const alreadyExists = await findBooking({
       patientId: data,
       doctorId,
       date,
       timeSlot,
       symptoms,
-    };
-    const validDoctorId = await findDoctor({ _id: doctorId });
-    if (!validDoctorId) {
-      return sendResponse(res, 400, "Doctor not found");
-    }
-    const alreadyExists = await findBooking(checkBooking);
+    });
     if (alreadyExists) {
       return sendResponse(res, 400, "Appointment already exists");
     }
@@ -179,7 +177,7 @@ const getAppoinment = async (req, res) => {
 
 const viewCase = async (req, res) => {
   try {
-    const patientId = req.user._id;
+    const patientId = req.user._id;   
     const data = await findCasesByPatient({ patientId: patientId.toString() });
     if (!data) {
       return sendResponse(res, 404, "Case not found");
@@ -194,8 +192,6 @@ const viewCase = async (req, res) => {
 const addHearingRequest = async (req, res) => {
   try {
     const patientId = req.user._id;
-    console.log(req.us);
-
     const { caseId, reason } = req.body;
 
     const caseData = await findCasesByPatient({
@@ -206,7 +202,7 @@ const addHearingRequest = async (req, res) => {
     }
 
     const alreadyExists = await findHearingRequest({ caseId });
-    if (alreadyExists) {
+    if (alreadyExists.length > 0) {
       return sendResponse(res, 400, "Hearing request already exists");
     }
 
@@ -232,6 +228,7 @@ const getHearing = async (req, res) => {
   try {
     const { id } = req.params;
     const data = await findHearingRequest({ _id: id });
+
     if (!data) {
       return sendResponse(res, 404, "Hearing not found");
     }

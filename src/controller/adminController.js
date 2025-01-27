@@ -7,6 +7,7 @@ const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const admin = await findAdmin({ email });
+
     if (!admin) {
       return sendResponse(res, 401, "Invalid email or password");
     }
@@ -22,6 +23,4 @@ const adminLogin = async (req, res) => {
   }
 };
 
-module.exports = {
-  adminLogin,
-};
+module.exports = adminLogin;

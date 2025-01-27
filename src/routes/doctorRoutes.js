@@ -65,4 +65,5 @@ doctorRouter.put(
   updateHearing
 );
 
+
 module.exports = { adminDoctorRouter, doctorRouter };

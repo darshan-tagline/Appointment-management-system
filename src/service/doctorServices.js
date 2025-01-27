@@ -19,9 +19,6 @@ const modifyDoctor = async (id, doctor) => {
   });
 };
 
-const findDoctorById = async (id) => {
-  return Doctor.findById(id);
-};
 const searchDoctor = async (data) => {
   const query = {};
   const page = Number(data.page) || 1;
@@ -48,7 +45,6 @@ module.exports = {
   findDoctor,
   addDoctor,
   searchDoctor,
-  findDoctorById,
   removeDoctor,
   modifyDoctor,
 };

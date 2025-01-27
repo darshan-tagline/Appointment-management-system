@@ -11,8 +11,6 @@ const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
     const alreadyExist = await findCategory({ name });
-    console.log(alreadyExist);
-
     if (alreadyExist) {
       return sendResponse(res, 400, "Category already exists");
     }

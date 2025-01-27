@@ -8,6 +8,7 @@ const findHearingRequest = async (data) => {
   return HearingRequest.findOne(data);
 };
 
+
 module.exports = {
   createHearingRequest,
   findHearingRequest,

@@ -1,5 +1,5 @@
 const express = require("express");
-const { adminLogin } = require("../controller/adminController");
+const adminLogin = require("../controller/adminController");
 const authorize = require("../middleware/adminMiddleware");
 const validate = require("../middleware/validateMiddleware");
 const adminvalidatorSchema = require("../validators/adminValidation");
