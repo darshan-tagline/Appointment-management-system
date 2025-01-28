@@ -1,12 +1,5 @@
 const { findCategory } = require("../service/categoryServices");
 const { passwordHash } = require("../utils/passwordUtils");
-const {
-  findDoctor,
-  addDoctor,
-  modifyDoctor,
-  removeDoctor,
-  searchDoctor,
-} = require("../service/doctorServices");
 const sendResponse = require("../utils/responseUtils");
 const { tokenGeneration } = require("../utils/token");
 const {
@@ -32,11 +25,20 @@ const {
   getAllHearingRequest,
   updateHearingRequest,
 } = require("../service/hearingRequestServices");
+const {
+  addNewUser,
+  findUser,
+  searchUser,
+  updateUser,
+  removeUser,
+} = require("../service/userServices");
 
 const createDoctor = async (req, res) => {
   try {
     const { name, email, password, categoryId } = req.body;
-    const alreadyExist = await findDoctor({ email });
+    const alreadyExist = await findUser({
+      email,
+    });
     if (alreadyExist) {
       return sendResponse(res, 400, "Doctor already exists");
     }
@@ -45,13 +47,13 @@ const createDoctor = async (req, res) => {
       return sendResponse(res, 400, "Category not found");
     }
     const hashedPassword = await passwordHash(password);
-    const doctorData = {
+    await addNewUser({
       name,
       email,
       password: hashedPassword,
+      role: "doctor",
       categoryId,
-    };
-    await addDoctor(doctorData);
+    });
     const subject = "Welcome to the System - Your Login Details";
     const textContent = `
       Dear Dr. ${name},
@@ -81,7 +83,7 @@ const getAllDoctors = async (req, res) => {
     const queryParams = req.query;
     let doctors;
 
-    doctors = await searchDoctor(queryParams);
+    doctors = await searchUser("doctor", queryParams);
     if (doctors.length === 0) {
       return sendResponse(res, 404, "No doctors found with the given name");
     }
@@ -95,7 +97,7 @@ const getAllDoctors = async (req, res) => {
 const getDoctorById = async (req, res) => {
   try {
     const { id } = req.params;
-    const doctor = await findDoctor({ _id: id });
+    const doctor = await findUser({ _id: id, role: "doctor" });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -110,7 +112,7 @@ const updateDoctor = async (req, res) => {
     let newPassword = null;
     const { id } = req.params;
     const { name, email, categoryId, password } = req.body;
-    const doctorData = await findDoctor({ _id: id });
+    const doctorData = await findUser({ _id: id, role: "doctor" });
     if (!doctorData) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -120,20 +122,30 @@ const updateDoctor = async (req, res) => {
         return sendResponse(res, 400, "Category not found");
       }
     }
-    const alreadyExist = await findDoctor({ email });
-    if (alreadyExist && alreadyExist._id.toString() !== id) {
-      return sendResponse(res, 400, "Doctor already exists");
+    if (email !== doctorData.email) {
+      const alreadyExist = await findUser({ email, role: "doctor" });
+      if (alreadyExist && alreadyExist._id.toString() !== id) {
+        return sendResponse(
+          res,
+          400,
+          "A doctor with this email already exists"
+        );
+      }
     }
     if (password) {
       newPassword = await passwordHash(password);
     }
 
-    const doctor = await modifyDoctor(id, {
-      name,
-      email,
-      categoryId,
-      password: newPassword ? newPassword : doctorData.password,
-    });
+    const doctor = await updateUser(
+      { _id: id, role: "doctor" },
+      {
+        name,
+        email,
+        categoryId,
+        password: newPassword ? newPassword : doctorData.password,
+      }
+    );
+    
     return sendResponse(res, 200, "Doctor updated successfully", doctor);
   } catch (error) {
     console.log("Server Error", error);
@@ -144,7 +156,7 @@ const updateDoctor = async (req, res) => {
 const deleteDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const doctor = await removeDoctor(id);
+    const doctor = await removeUser({ _id: id, role: "doctor" });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -155,24 +167,24 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
-const doctorLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const doctor = await findDoctor({ email });
-    if (!doctor) {
-      return sendResponse(res, 401, "Invalid email or password");
-    }
-    const isPasswordMatch = await passwordCompare(password, doctor.password);
-    if (!isPasswordMatch) {
-      return sendResponse(res, 401, "Invalid email or password");
-    }
-    const token = tokenGeneration(doctor._id);
-    return sendResponse(res, 200, "Login successful", { token });
-  } catch (error) {
-    console.log("Server Error", error);
-    return sendResponse(res, 500, "Server error");
-  }
-};
+// const doctorLogin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const doctor = await findUser({ email, role: "doctor" });
+//     if (!doctor) {
+//       return sendResponse(res, 401, "Invalid email or password");
+//     }
+//     const isPasswordMatch = await passwordCompare(password, doctor.password);
+//     if (!isPasswordMatch) {
+//       return sendResponse(res, 401, "Invalid email or password");
+//     }
+//     const token = tokenGeneration({ id: doctor._id, role: doctor.role }, "7d");
+//     return sendResponse(res, 200, "Login successful", { token });
+//   } catch (error) {
+//     console.log("Server Error", error);
+//     return sendResponse(res, 500, "Server error");
+//   }
+// };
 
 const getAppointmentForDoctor = async (req, res) => {
   try {
@@ -366,7 +378,7 @@ const getHearingRequests = async (req, res) => {
     const doctorId = req.user._id;
     const cases = await findCasesByDoctor({ doctorId });
     const caseIds = cases.map((caseItem) => caseItem._id);
-    const data = await getAllHearingRequest({ caseId: { $in: caseIds } });
+    const data = await getAllHearingRequest(caseIds);
     if (!data) {
       return sendResponse(res, 404, "Hearing not found");
     }
@@ -405,7 +417,7 @@ module.exports = {
   getDoctorById,
   updateDoctor,
   deleteDoctor,
-  doctorLogin,
+  // doctorLogin,
   updateAppointment,
   getAppointmentForDoctor,
   getCase,

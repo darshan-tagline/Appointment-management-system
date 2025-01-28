@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const patientSchema = new mongoose.Schema(
+
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -10,27 +11,35 @@ const patientSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
       trim: true,
     },
     password: {
       type: String,
       minlength: 6,
     },
+    role: {
+      type: String,
+      enum: ["admin", "doctor", "patient"],
+      required: true,
+    },
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
     isVerified: {
       type: Boolean,
-      default: false,
     },
     otp: {
       type: String,
-      required: false,
     },
     otpExpires: {
       type: Date,
-      required: false,
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
-const Patient = mongoose.model("Patient", patientSchema);
-module.exports = Patient;
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;

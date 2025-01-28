@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  doctorLogin,
   updateAppointment,
   getAppointmentForDoctor,
   getCase,
@@ -10,7 +9,6 @@ const {
   getHearingRequests,
   updateHearingStatus,
 } = require("../controller/doctorController");
-const authorizeDoctor = require("../middleware/doctorMiddleware");
 const validate = require("../middleware/validateMiddleware");
 const {
   createDoctor,
@@ -47,33 +45,29 @@ adminDoctorRouter.put(
 );
 adminDoctorRouter.delete("/:id", deleteDoctor);
 
-doctorRouter.post("/login", doctorLogin);
-doctorRouter.get("/appoinment", authorizeDoctor, getAppointmentForDoctor);
+// doctorRouter.post("/login", doctorLogin);
+doctorRouter.get("/appoinment", getAppointmentForDoctor);
 doctorRouter.put(
   "/appoinment/:id",
-  authorizeDoctor,
   validate(appointmentUpdateValidatorSchema),
   updateAppointment
 );
-doctorRouter.get("/case", authorizeDoctor, getCase);
-doctorRouter.get("/hearing/:id", authorizeDoctor, getHearing);
+doctorRouter.get("/case", getCase);
+doctorRouter.get("/hearing/:id", getHearing);
 doctorRouter.post(
   "/hearing",
-  authorizeDoctor,
   validate(hearingValidatorSchema),
   addHearing
 );
 doctorRouter.put(
   "/hearing/:id",
-  authorizeDoctor,
   validate(hearingUpdateValidatorSchema),
   updateHearing
 );
 
-doctorRouter.get("/hearingrequests", authorizeDoctor, getHearingRequests);
+doctorRouter.get("/hearingrequests", getHearingRequests);
 doctorRouter.put(
   "/hearingrequest/:id",
-  authorizeDoctor,
   validate(hearingRequestUpdateValidatorSchema),
   updateHearingStatus
 );

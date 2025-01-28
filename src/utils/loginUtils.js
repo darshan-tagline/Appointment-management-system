@@ -1,15 +1,27 @@
 const sendResponse = require("../utils/responseUtils");
-const { tokenGeneration } = require("../utils/token");
-const { passwordCompare } = require("../utils/passwordUtils");
 const { findUser } = require("../service/userServices");
+const { passwordCompare } = require("../utils/passwordUtils");
+const { tokenGeneration } = require("../utils/token");
 
-const adminLogin = async (req, res) => {
+const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await findUser({ email, role: "admin" });
+    const { email, password, role } = req.body;
 
+    if (!role) {
+      return sendResponse(res, 400, "Role is required.");
+    }
+
+    const user = await findUser({ email, role });
     if (!user) {
       return sendResponse(res, 401, "Invalid email or password");
+    }
+
+    if (role === "patient" && user.isVerified === false) {
+      return sendResponse(
+        res,
+        401,
+        "Account not verified. Please verify your email."
+      );
     }
 
     const isPasswordMatch = await passwordCompare(password, user.password);
@@ -21,9 +33,9 @@ const adminLogin = async (req, res) => {
 
     return sendResponse(res, 200, "Login successful", { token });
   } catch (error) {
-    console.log("error", error);
+    console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
   }
 };
 
-module.exports = adminLogin;
+module.exports = login;
