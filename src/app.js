@@ -17,8 +17,11 @@ app.use(
     credentials: true,
   })
 );
+
 connectDB();
+
 // createAdmin();
+
 app.use(express.json());
 app.use(
   session({
@@ -30,7 +33,12 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use("/api", router);
+
+app.get("/", (req, res) => {
+  return sendResponse(res, 200, "Server is online");
+});
 
 app.use("*", (req, res) => {
   return sendResponse(res, 404, "Page not found");
@@ -42,5 +50,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () =>
-  console.log(`Servere connected successfully and port is ${port}`)
+  console.log(`Server connected successfully and port is ${port}`)
 );

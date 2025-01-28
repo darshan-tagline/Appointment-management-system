@@ -6,7 +6,7 @@ const {
   findBooking,
   findAppointment,
 } = require("../service/appoinmentServices");
-const { passwordHash, passwordCompare } = require("../utils/passwordUtils");
+const { passwordHash } = require("../utils/passwordUtils");
 const { findCasesByPatient } = require("../service/caseServices");
 const {
   createHearingRequest,
@@ -39,7 +39,6 @@ const patientSignUp = async (req, res) => {
     return sendResponse(res, 500, "Server error");
   }
 };
-
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -77,38 +76,6 @@ const validateOTP = async (req, res) => {
     return sendResponse(res, 500, "Server error.");
   }
 };
-// const paientLogin = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const user = await findUser({ email });
-//     if (!user) {
-//       return sendResponse(res, 401, "Invalid email or password");
-//     }
-//     if (user.isVerified == false) {
-//       return sendResponse(
-//         res,
-//         401,
-//         "Account not verified. Please verify your email."
-//       );
-//     }
-//     const isPasswordMatch = await passwordCompare(password, user.password);
-//     if (!isPasswordMatch) {
-//       return sendResponse(res, 401, "Invalid email or password");
-//     }
-//     const accessToken = tokenGeneration(
-//       { id: user._id, role: user.role },
-//       "7d"
-//     );
-
-//     return sendResponse(res, 200, "Login successful", {
-//       accessToken,
-//     });
-//   } catch (error) {
-//     console.log("Server Error", error);
-//     return sendResponse(res, 500, "Server error");
-//   }
-// };
-
 const createAppointment = async (req, res) => {
   try {
     const { doctorId, date, timeSlot, symptoms } = req.body;
@@ -180,7 +147,7 @@ const viewCase = async (req, res) => {
   try {
     const patientId = req.user._id;
     const data = await findCasesByPatient({ patientId: patientId.toString() });
-      
+
     if (!data) {
       return sendResponse(res, 404, "Case not found");
     }
@@ -244,7 +211,7 @@ const getHearing = async (req, res) => {
 };
 
 module.exports = {
-  // paientLogin,
+
   validateOTP,
   patientSignUp,
   createAppointment,

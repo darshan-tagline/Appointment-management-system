@@ -5,7 +5,6 @@ const { adminDoctorRouter } = require("./doctorRoutes");
 
 const adminRouter = express.Router();
 
-// adminRouter.post("/login", validate(adminvalidatorSchema), adminLogin);
 adminRouter.use("/category", categoryRouter);
 adminRouter.use("/medicine", medicineRouter);
 adminRouter.use("/doctor", adminDoctorRouter);

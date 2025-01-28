@@ -162,29 +162,11 @@ const deleteDoctor = async (req, res) => {
     return sendResponse(res, 500, "Server error");
   }
 };
-
-// const doctorLogin = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const doctor = await findUser({ email, role: "doctor" });
-//     if (!doctor) {
-//       return sendResponse(res, 401, "Invalid email or password");
-//     }
-//     const isPasswordMatch = await passwordCompare(password, doctor.password);
-//     if (!isPasswordMatch) {
-//       return sendResponse(res, 401, "Invalid email or password");
-//     }
-//     const token = tokenGeneration({ id: doctor._id, role: doctor.role }, "7d");
-//     return sendResponse(res, 200, "Login successful", { token });
-//   } catch (error) {
-//     console.log("Server Error", error);
-//     return sendResponse(res, 500, "Server error");
-//   }
-// };
-
 const getAppointmentForDoctor = async (req, res) => {
   try {
     const doctorId = req.user.id;
+    console.log(doctorId);
+    
     const appointments = await findAppointment({ doctorId });
     if (!appointments || appointments.length === 0) {
       return sendResponse(res, 404, "No appointments found.");

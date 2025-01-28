@@ -1,14 +1,5 @@
 const express = require("express");
-const {
-  updateAppointment,
-  getAppointmentForDoctor,
-  getCase,
-  addHearing,
-  updateHearing,
-  getHearing,
-  getHearingRequests,
-  updateHearingStatus,
-} = require("../controller/doctorController");
+const { getCase } = require("../controller/doctorController");
 const validate = require("../middleware/validateMiddleware");
 const {
   createDoctor,
@@ -18,19 +9,12 @@ const {
   getDoctorById,
 } = require("../controller/doctorController");
 const {
-  hearingValidatorSchema,
-  hearingUpdateValidatorSchema,
-} = require("../validators/hearingValidation");
-const {
   doctorValidatorSchema,
   doctorUpdateValidatorSchema,
 } = require("../validators/doctorValidation");
-const {
-  appointmentUpdateValidatorSchema,
-} = require("../validators/appoinmentValidation");
-const {
-  hearingRequestUpdateValidatorSchema,
-} = require("../validators/hearingRequestValidation");
+const { appointmentRouterForDoctor } = require("./appointmentRoutes");
+const hearingRouter = require("./hearingRoutes");
+const { hearingRequestRouter } = require("./hearingRequestRoutes");
 
 const adminDoctorRouter = express.Router();
 const doctorRouter = express.Router();
@@ -45,31 +29,9 @@ adminDoctorRouter.put(
 );
 adminDoctorRouter.delete("/:id", deleteDoctor);
 
-// doctorRouter.post("/login", doctorLogin);
-doctorRouter.get("/appoinment", getAppointmentForDoctor);
-doctorRouter.put(
-  "/appoinment/:id",
-  validate(appointmentUpdateValidatorSchema),
-  updateAppointment
-);
+doctorRouter.use("/appointment", appointmentRouterForDoctor);
+doctorRouter.use("/hearing", hearingRouter);
+doctorRouter.use("/hearingrequest", hearingRequestRouter);
 doctorRouter.get("/case", getCase);
-doctorRouter.get("/hearing/:id", getHearing);
-doctorRouter.post(
-  "/hearing",
-  validate(hearingValidatorSchema),
-  addHearing
-);
-doctorRouter.put(
-  "/hearing/:id",
-  validate(hearingUpdateValidatorSchema),
-  updateHearing
-);
-
-doctorRouter.get("/hearingrequests", getHearingRequests);
-doctorRouter.put(
-  "/hearingrequest/:id",
-  validate(hearingRequestUpdateValidatorSchema),
-  updateHearingStatus
-);
 
 module.exports = { adminDoctorRouter, doctorRouter };
