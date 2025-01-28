@@ -9,6 +9,7 @@ const router = require("./routes/router");
 const passportUtils = require("./utils/passport");
 const session = require("express-session");
 const port = process.env.PORT || 3000;
+// const createAdmin = require("./utils/createAdmin");
 
 app.use(
   cors({
@@ -37,7 +38,7 @@ app.use("*", (req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  return sendResponse(res, 500, err.message);
+  return sendResponse(res, 500, err.message || "Server error");
 });
 
 app.listen(port, () =>

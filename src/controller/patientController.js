@@ -1,41 +1,36 @@
 const sendResponse = require("../utils/responseUtils");
 const { tokenGeneration } = require("../utils/token");
 const {
-  addNewPatient,
-  findPatientByVal,
-  findAndUpdatePatient,
-} = require("../service/patientServices");
-const {
   addNewAppoinment,
   findTimeSlot,
   findBooking,
   findAppointment,
 } = require("../service/appoinmentServices");
 const { passwordHash, passwordCompare } = require("../utils/passwordUtils");
-const { findDoctor } = require("../service/doctorServices");
 const { findCasesByPatient } = require("../service/caseServices");
 const {
   createHearingRequest,
   findHearingRequest,
 } = require("../service/hearingRequestServices");
 const { sendOTP } = require("../utils/otpUtils");
+const { findUser, updateUser, addNewUser } = require("../service/userServices");
 
 const patientSignUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const alreadyExists = await findPatientByVal({ email });
+    const alreadyExists = await findUser({ email });
     if (alreadyExists) {
       return sendResponse(res, 400, "Patient already exists");
     }
 
     const hashedPassword = await passwordHash(password);
-    const patientData = {
+    const patient = await addNewUser({
       name,
       email,
       password: hashedPassword,
+      role: "patient",
       isVerified: false,
-    };
-    const patient = await addNewPatient(patientData);
+    });
 
     await sendOTP(patient.email);
     return sendResponse(res, 201, "OTP sent successfully.");
@@ -48,7 +43,7 @@ const patientSignUp = async (req, res) => {
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const patient = await findPatientByVal({ email });
+    const patient = await findUser({ email, role: "patient" });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }
@@ -61,7 +56,7 @@ const validateOTP = async (req, res) => {
       return sendResponse(res, 400, "Invalid OTP.");
     }
 
-    await findAndUpdatePatient(
+    await updateUser(
       { email },
       {
         isVerified: true,
@@ -69,7 +64,10 @@ const validateOTP = async (req, res) => {
         otpExpires: null,
       }
     );
-    const accessToken = tokenGeneration(patient._id, "7d");
+    const accessToken = tokenGeneration(
+      { id: patient._id, role: patient.role },
+      "7d"
+    );
 
     return sendResponse(res, 200, "OTP validated successfully.", {
       accessToken,
@@ -79,34 +77,37 @@ const validateOTP = async (req, res) => {
     return sendResponse(res, 500, "Server error.");
   }
 };
-const paientLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await findPatientByVal({ email });
-    if (!user) {
-      return sendResponse(res, 401, "Invalid email or password");
-    }
-    if (user.isVerified == false) {
-      return sendResponse(
-        res,
-        401,
-        "Account not verified. Please verify your email."
-      );
-    }
-    const isPasswordMatch = await passwordCompare(password, user.password);
-    if (!isPasswordMatch) {
-      return sendResponse(res, 401, "Invalid email or password");
-    }
-    const accessToken = tokenGeneration(user._id, "7d");
+// const paientLogin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await findUser({ email });
+//     if (!user) {
+//       return sendResponse(res, 401, "Invalid email or password");
+//     }
+//     if (user.isVerified == false) {
+//       return sendResponse(
+//         res,
+//         401,
+//         "Account not verified. Please verify your email."
+//       );
+//     }
+//     const isPasswordMatch = await passwordCompare(password, user.password);
+//     if (!isPasswordMatch) {
+//       return sendResponse(res, 401, "Invalid email or password");
+//     }
+//     const accessToken = tokenGeneration(
+//       { id: user._id, role: user.role },
+//       "7d"
+//     );
 
-    return sendResponse(res, 200, "Login successful", {
-      accessToken,
-    });
-  } catch (error) {
-    console.log("Server Error", error);
-    return sendResponse(res, 500, "Server error");
-  }
-};
+//     return sendResponse(res, 200, "Login successful", {
+//       accessToken,
+//     });
+//   } catch (error) {
+//     console.log("Server Error", error);
+//     return sendResponse(res, 500, "Server error");
+//   }
+// };
 
 const createAppointment = async (req, res) => {
   try {
@@ -116,7 +117,7 @@ const createAppointment = async (req, res) => {
     if (!token) {
       return sendResponse(res, 401, "Authorization token is missing");
     }
-    const validDoctorId = await findDoctor({ _id: doctorId });
+    const validDoctorId = await findUser({ _id: doctorId, role: "doctor" });
     if (!validDoctorId) {
       return sendResponse(res, 400, "Doctor not found");
     }
@@ -154,7 +155,7 @@ const createAppointment = async (req, res) => {
 const getAppoinment = async (req, res) => {
   try {
     const id = req.user._id;
-    const data = await findPatientByVal({ _id: id.toString() });
+    const data = await findUser({ _id: id });
     if (!data) {
       return sendResponse(res, 404, "Patient not found");
     }
@@ -179,6 +180,7 @@ const viewCase = async (req, res) => {
   try {
     const patientId = req.user._id;
     const data = await findCasesByPatient({ patientId: patientId.toString() });
+      
     if (!data) {
       return sendResponse(res, 404, "Case not found");
     }
@@ -242,7 +244,7 @@ const getHearing = async (req, res) => {
 };
 
 module.exports = {
-  paientLogin,
+  // paientLogin,
   validateOTP,
   patientSignUp,
   createAppointment,

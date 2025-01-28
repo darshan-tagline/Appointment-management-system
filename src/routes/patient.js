@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  paientLogin,
   patientSignUp,
   createAppointment,
   getAppoinment,
@@ -10,11 +9,6 @@ const {
   validateOTP,
 } = require("../controller/patientController");
 const validate = require("../middleware/validateMiddleware");
-const {
-  authorizePatient,
-  googleAuth,
-  googleAuthCallback,
-} = require("../middleware/patientMiddleware");
 const patientValidatorSchema = require("../validators/patientValidation");
 const {
   appointmentValidatorSchema,
@@ -23,6 +17,11 @@ const {
   hearingRequestValidatorSchema,
 } = require("../validators/hearingRequestValidation");
 const passport = require("passport");
+const {
+  googleAuth,
+  googleAuthCallback,
+} = require("../middleware/googleAuthMiddleware");
+const authorize = require("../middleware/authorizeMiddleware");
 const patientRouter = express.Router();
 
 patientRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
@@ -36,19 +35,19 @@ patientRouter.get(
 );
 
 patientRouter.post("/validate-otp", validateOTP);
-patientRouter.post("/login", paientLogin);
+// patientRouter.post("/login", paientLogin);
 patientRouter.post(
   "/appoinment",
-  authorizePatient,
+  authorize("patient"),
   validate(appointmentValidatorSchema),
   createAppointment
 );
-patientRouter.get("/appoinment", authorizePatient, getAppoinment);
-patientRouter.get("/case", authorizePatient, viewCase);
-patientRouter.get("/hearingrequest", authorizePatient, getHearing);
+patientRouter.get("/appoinment", authorize("patient"), getAppoinment);
+patientRouter.get("/case", authorize("patient"), viewCase);
+patientRouter.get("/hearingrequest", authorize("patient"), getHearing);
 patientRouter.post(
   "/hearingrequest",
-  authorizePatient,
+  authorize("patient"),
   validate(hearingRequestValidatorSchema),
   addHearingRequest
 );
