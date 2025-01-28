@@ -6,11 +6,6 @@ const { tokenGeneration } = require("../utils/token");
 const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
-
-    if (!role) {
-      return sendResponse(res, 400, "Role is required.");
-    }
-
     const user = await findUser({ email, role });
     if (!user) {
       return sendResponse(res, 401, "Invalid email or password");

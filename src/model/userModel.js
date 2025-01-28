@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "doctor", "patient"],
       required: true,
+      lowercase: true,
     },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,

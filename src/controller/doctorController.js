@@ -1,7 +1,6 @@
 const { findCategory } = require("../service/categoryServices");
 const { passwordHash } = require("../utils/passwordUtils");
 const sendResponse = require("../utils/responseUtils");
-const { tokenGeneration } = require("../utils/token");
 const {
   updateStatus,
   findAppointment,
@@ -11,7 +10,6 @@ const {
   findCasesByDoctor,
   findCase,
 } = require("../service/caseServices");
-const { passwordCompare } = require("../utils/passwordUtils");
 const {
   addNewHearing,
   findHearing,
@@ -61,9 +59,7 @@ const createDoctor = async (req, res) => {
       Your account has been created.
 
       Email: ${email}
-      Temporary Password: ${password}
-
-      Please log in and change your password immediately.
+      Password: ${password}
 
       Best regards,
       Your System Team

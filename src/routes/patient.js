@@ -38,16 +38,16 @@ patientRouter.post("/validate-otp", validateOTP);
 // patientRouter.post("/login", paientLogin);
 patientRouter.post(
   "/appoinment",
-  authorize("patient"),
+  authorize(["patient"]),
   validate(appointmentValidatorSchema),
   createAppointment
 );
-patientRouter.get("/appoinment", authorize("patient"), getAppoinment);
-patientRouter.get("/case", authorize("patient"), viewCase);
-patientRouter.get("/hearingrequest", authorize("patient"), getHearing);
+patientRouter.get("/appoinment", authorize(["patient"]), getAppoinment);
+patientRouter.get("/case", authorize(["patient"]), viewCase);
+patientRouter.get("/hearingrequest", authorize(["patient"]), getHearing);
 patientRouter.post(
   "/hearingrequest",
-  authorize("patient"),
+  authorize(["patient"]),
   validate(hearingRequestValidatorSchema),
   addHearingRequest
 );
