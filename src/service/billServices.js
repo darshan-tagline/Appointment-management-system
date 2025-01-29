@@ -17,7 +17,12 @@ const createBill = async (caseId, hearingId, totalAmount) => {
 };
 
 const findBill = async (data) => {
-  return Bill.findOne(data);
+  try {
+    return Bill.findOne(data);
+  } catch (error) {
+    console.log("Server Error", error);
+    return null;
+  }
 };
 module.exports = {
   createBill,

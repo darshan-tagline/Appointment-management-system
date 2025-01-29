@@ -47,7 +47,7 @@ const patientSignUp = async (req, res) => {
       return sendResponse(res, 400, "Patient already exists");
     }
 
-    const hashedPassword = await passwordHash(password);
+    const hashedPassword =  passwordHash(password);
     const patient = await addNewUser({
       name,
       email,

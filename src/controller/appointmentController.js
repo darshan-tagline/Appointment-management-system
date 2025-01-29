@@ -14,7 +14,7 @@ const createAppointment = async (req, res) => {
     const patientId = req.user._id;
     const validDoctorId = await findUser({ _id: doctorId, role: "doctor" });
     if (!validDoctorId) {
-      return sendResponse(res, 400, "Doctor not found");
+      return sendResponse(res, 404, "Doctor not found");
     }
     const alreadyExists = await findBooking({
       patientId: patientId,
