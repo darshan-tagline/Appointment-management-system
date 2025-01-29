@@ -1,17 +1,17 @@
 const express = require("express");
-const login = require("../utils/loginUtils");
 const validate = require("../middleware/validateMiddleware");
 const loginValidatorSchema = require("../validators/loginValidation");
-const {
-  patientSignUp,
-  validateOTP,
-} = require("../controller/patientController");
 const patientValidatorSchema = require("../validators/patientValidation");
 const passport = require("passport");
 const {
   googleAuth,
   googleAuthCallback,
 } = require("../middleware/googleAuthMiddleware");
+const {
+  login,
+  patientSignUp,
+  validateOTP,
+} = require("../controller/authController");
 const authRouter = express.Router();
 
 authRouter.post("/login", validate(loginValidatorSchema), login);

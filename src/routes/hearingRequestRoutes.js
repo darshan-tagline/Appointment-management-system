@@ -2,7 +2,7 @@ const express = require("express");
 const {
   getHearingRequests,
   updateHearingStatus,
-} = require("../controller/doctorController");
+} = require("../controller/hearingRequestController");
 const validate = require("../middleware/validateMiddleware");
 const {
   hearingRequestUpdateValidatorSchema,
@@ -11,7 +11,7 @@ const {
 const {
   getHearing,
   addHearingRequest,
-} = require("../controller/patientController");
+} = require("../controller/hearingRequestController");
 
 const hearingRequestRouter = express.Router();
 const hearingRequestRouterForPatient = express.Router();

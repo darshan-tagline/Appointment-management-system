@@ -5,13 +5,11 @@ const {
   appointmentUpdateValidatorSchema,
 } = require("../validators/appoinmentValidation");
 const {
-  createAppointment,
-  getAppoinment,
-} = require("../controller/patientController");
-const {
   getAppointmentForDoctor,
   updateAppointment,
-} = require("../controller/doctorController");
+  createAppointment,
+  getAppoinment,
+} = require("../controller/appointmentController");
 const appoinmentRouter = express.Router();
 const appointmentRouterForDoctor = express.Router();
 

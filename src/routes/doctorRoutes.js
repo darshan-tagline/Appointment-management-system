@@ -1,5 +1,5 @@
 const express = require("express");
-const { getCase } = require("../controller/doctorController");
+const { getCase } = require("../controller/caseController");
 const validate = require("../middleware/validateMiddleware");
 const {
   createDoctor,

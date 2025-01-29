@@ -4,7 +4,7 @@ const {
   getHearing,
   updateHearing,
   addHearing,
-} = require("../controller/doctorController");
+} = require("../controller/hearingController");
 const {
   hearingUpdateValidatorSchema,
 } = require("../validators/hearingValidation");

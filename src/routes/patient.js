@@ -1,5 +1,5 @@
 const express = require("express");
-const { viewCase } = require("../controller/patientController");
+const { viewCase } = require("../controller/caseController");
 const { appoinmentRouter } = require("./appointmentRoutes");
 const { hearingRequestRouterForPatient } = require("./hearingRequestRoutes");
 const patientRouter = express.Router();
