@@ -6,6 +6,7 @@ const passport = require("passport");
 const {
   googleAuth,
   googleAuthCallback,
+  googleMiddlware,
 } = require("../middleware/googleAuthMiddleware");
 const {
   login,
@@ -18,10 +19,6 @@ authRouter.post("/login", validate(loginValidatorSchema), login);
 authRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
 authRouter.post("/validateOTP", validateOTP);
 authRouter.get("/google", googleAuth);
-authRouter.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/signup" }),
-  googleAuthCallback
-);
+authRouter.get("/google/callback", googleMiddlware, googleAuthCallback);
 
 module.exports = authRouter;
