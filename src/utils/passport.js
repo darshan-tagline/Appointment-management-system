@@ -20,7 +20,7 @@ passport.use(
       try {
         const email = profile.emails[0].value;
 
-        let patient = await findUser({ email, role: "patient" });
+        let patient = await findUser({ email });
         if (patient) {
           const token = tokenGeneration(patient._id, "1d");
           return done(null, { ...patient.toObject(), accessToken: token });

@@ -24,9 +24,12 @@ const login = async (req, res) => {
       return sendResponse(res, 401, "Invalid email or password");
     }
 
-    const token = tokenGeneration({ id: user._id, role: user.role }, "7d");
+    const accessToken = tokenGeneration(
+      { id: user._id, role: user.role },
+      "7d"
+    );
 
-    return sendResponse(res, 200, "Login successful", { token });
+    return sendResponse(res, 200, "Login successful", { accessToken });
   } catch (error) {
     console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");

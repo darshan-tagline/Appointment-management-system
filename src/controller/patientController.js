@@ -79,7 +79,7 @@ const validateOTP = async (req, res) => {
 const createAppointment = async (req, res) => {
   try {
     const { doctorId, date, timeSlot, symptoms } = req.body;
-    const data = req.user._id;
+    const patientId = req.user._id;
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       return sendResponse(res, 401, "Authorization token is missing");
@@ -89,7 +89,7 @@ const createAppointment = async (req, res) => {
       return sendResponse(res, 400, "Doctor not found");
     }
     const alreadyExists = await findBooking({
-      patientId: data,
+      patientId: patientId,
       doctorId,
       date,
       timeSlot,
@@ -104,7 +104,7 @@ const createAppointment = async (req, res) => {
     }
 
     const newAppointment = {
-      patientId: data,
+      patientId: patientId,
       doctorId,
       date,
       timeSlot,
@@ -122,11 +122,11 @@ const createAppointment = async (req, res) => {
 const getAppoinment = async (req, res) => {
   try {
     const id = req.user._id;
-    const data = await findUser({ _id: id });
-    if (!data) {
+    const userData = await findUser({ _id: id });
+    if (!userData) {
       return sendResponse(res, 404, "Patient not found");
     }
-    const patientId = data._id;
+    const patientId = userData._id;
     const appointments = await findAppointment({ patientId });
     if (!appointments || appointments.length === 0) {
       return sendResponse(res, 404, "No appointments found.");
@@ -146,12 +146,14 @@ const getAppoinment = async (req, res) => {
 const viewCase = async (req, res) => {
   try {
     const patientId = req.user._id;
-    const data = await findCasesByPatient({ patientId: patientId.toString() });
+    const caseData = await findCasesByPatient({
+      patientId: patientId.toString(),
+    });
 
-    if (!data) {
+    if (!caseData) {
       return sendResponse(res, 404, "Case not found");
     }
-    return sendResponse(res, 200, "Case fetched successfully", data);
+    return sendResponse(res, 200, "Case fetched successfully", caseData);
   } catch (error) {
     console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
@@ -171,8 +173,6 @@ const addHearingRequest = async (req, res) => {
     }
 
     const alreadyExists = await findHearingRequest({ caseId });
-    console.log(alreadyExists);
-
     if (alreadyExists) {
       return sendResponse(res, 400, "Hearing request already exists");
     }
@@ -211,7 +211,6 @@ const getHearing = async (req, res) => {
 };
 
 module.exports = {
-
   validateOTP,
   patientSignUp,
   createAppointment,

@@ -224,11 +224,11 @@ const updateAppointment = async (req, res) => {
 const getCase = async (req, res) => {
   try {
     const doctorId = req.user.id;
-    const data = await findCasesByDoctor({ doctorId });
-    if (!data) {
+    const doctorData = await findCasesByDoctor({ doctorId });
+    if (!doctorData) {
       return sendResponse(res, 404, "Case not found");
     }
-    return sendResponse(res, 200, "Case fetched successfully", data);
+    return sendResponse(res, 200, "Case fetched successfully", doctorData);
   } catch (error) {
     console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");
@@ -240,7 +240,7 @@ const addHearing = async (req, res) => {
     const { caseId, description, prescription } = req.body;
     const validCase = await findCase({ _id: caseId });
     if (!validCase) {
-      return sendResponse(res, 400, `case does not exist in the database.`);
+      return sendResponse(res, 400, `case does not exist.`);
     }
 
     const existingCase = await findHearing({ caseId });
@@ -248,7 +248,7 @@ const addHearing = async (req, res) => {
       return sendResponse(
         res,
         400,
-        "Hearing for this case already exists in the database."
+        "Hearing for this case already exists."
       );
     }
     for (let i = 0; i < prescription.length; i++) {
@@ -356,11 +356,11 @@ const getHearingRequests = async (req, res) => {
     const doctorId = req.user._id;
     const cases = await findCasesByDoctor({ doctorId });
     const caseIds = cases.map((caseItem) => caseItem._id);
-    const data = await getAllHearingRequest(caseIds);
-    if (!data) {
+    const caseData = await getAllHearingRequest(caseIds);
+    if (!caseData) {
       return sendResponse(res, 404, "Hearing not found");
     }
-    return sendResponse(res, 200, "Hearing fetched successfully", data);
+    return sendResponse(res, 200, "Hearing fetched successfully", caseData);
   } catch (error) {
     console.log("Server Error", error);
     return sendResponse(res, 500, "Server error");

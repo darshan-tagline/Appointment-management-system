@@ -24,8 +24,8 @@ const authorize = (requiredRoles = []) => {
       } catch (jwtError) {
         console.error("JWT verification failed:", jwtError.message);
         return sendResponse(res, 401, "Invalid or expired JWT token.");
-      }      
-      const { id, role } = decoded.data;
+      }
+      const { id, role } = decoded.payload;
       const user = await findUser({ _id: id, role });
 
       if (!user) {

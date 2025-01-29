@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 
-const tokenGeneration = (data, expiresIn = "1d") => {
-  return jwt.sign({ data }, process.env.JWT_SECRET, { expiresIn });
+const tokenGeneration = (payload, expiresIn = "1d") => {
+  return jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn });
 };
 
-const tokenVarification = (token) => { 
+const tokenVarification = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
 const tokenDecode = (token) => {
