@@ -34,7 +34,7 @@ const login = async (req, res) => {
 
     return sendResponse(res, 200, "Login successful", { accessToken });
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in login:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -59,7 +59,7 @@ const patientSignUp = async (req, res) => {
     await sendOTP(patient.email);
     return sendResponse(res, 201, "OTP sent successfully.");
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in patient sign up:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -97,7 +97,7 @@ const validateOTP = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    console.error("Error validating OTP:", error);
+    console.error("Error validating OTP:>>>>>", error);
     return sendResponse(res, 500, "Server error.");
   }
 };

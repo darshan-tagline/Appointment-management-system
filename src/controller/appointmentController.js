@@ -42,7 +42,7 @@ const createAppointment = async (req, res) => {
 
     return sendResponse(res, 200, "Appointment created successfully", booking);
   } catch (error) {
-    console.error("Error creating appointment:", error);
+    console.error("Error creating appointment:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -66,7 +66,7 @@ const getAppoinment = async (req, res) => {
       appointments
     );
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error fetching appointments:>>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -84,7 +84,7 @@ const getAppointmentForDoctor = async (req, res) => {
       appointments
     );
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error fetching appointments:>>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -123,7 +123,7 @@ const updateAppointment = async (req, res) => {
       { appointment, caseCreated }
     );
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error updating appointment:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };

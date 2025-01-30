@@ -14,7 +14,7 @@ const createAdmin = async () => {
       console.log("Admin already exists");
       
     }
-    const hashedPassword = await passwordHash(password);
+    const hashedPassword = passwordHash(password);
 
     const admin = await addNewUser({
       name,

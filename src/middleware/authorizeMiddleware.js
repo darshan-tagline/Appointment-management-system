@@ -43,7 +43,7 @@ const authorize = (requiredRoles = []) => {
       req.user = user;
       next();
     } catch (error) {
-      console.error("Authorization error:", error);
+      console.error("Authorization error:>>>>>", error);
       return sendResponse(res, 500, "Server error.");
     }
   };

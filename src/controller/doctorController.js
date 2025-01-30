@@ -2,7 +2,6 @@ const { findCategory } = require("../service/categoryServices");
 const { passwordHash } = require("../utils/passwordUtils");
 const sendResponse = require("../utils/responseUtils");
 const sendEmail = require("../utils/sendMail");
-const { findMedicine } = require("../service/medicineServices");
 const {
   addNewUser,
   findUser,
@@ -49,7 +48,7 @@ const createDoctor = async (req, res) => {
 
     return sendResponse(res, 201, "Doctor created successfully");
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in create doctor:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -65,7 +64,7 @@ const getAllDoctors = async (req, res) => {
     }
     return sendResponse(res, 200, "Doctors fetched successfully", doctors);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in get all doctors:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -79,7 +78,7 @@ const getDoctorById = async (req, res) => {
     }
     return sendResponse(res, 200, "Doctor fetched successfully", doctor);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in get doctor by id:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -109,7 +108,7 @@ const updateDoctor = async (req, res) => {
       }
     }
     if (password) {
-      newPassword = await passwordHash(password);
+      newPassword = passwordHash(password);
     }
 
     const doctor = await updateUser(
@@ -121,10 +120,10 @@ const updateDoctor = async (req, res) => {
         password: newPassword ? newPassword : doctorData.password,
       }
     );
-    
+
     return sendResponse(res, 200, "Doctor updated successfully", doctor);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in update doctor:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -138,7 +137,7 @@ const deleteDoctor = async (req, res) => {
     }
     return sendResponse(res, 200, "Doctor deleted successfully");
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in delete doctor:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -149,6 +148,4 @@ module.exports = {
   getDoctorById,
   updateDoctor,
   deleteDoctor,
-
-
 };

@@ -19,9 +19,6 @@ const findCasesByPatient = async (data) => {
   return cases;
 };
 
-const updateCaseStatus = async (id, status) => {
-  return Case.findByIdAndUpdate(id, { status }, { new: true });
-};
 
 const findCase = async (data) => {
   return Case.findOne(data);
@@ -32,5 +29,4 @@ module.exports = {
   findCasesByDoctor,
   findCasesByPatient,
   findCase,
-  updateCaseStatus,
 };

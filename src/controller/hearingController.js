@@ -39,7 +39,7 @@ const addHearing = async (req, res) => {
 
     return sendResponse(res, 201, "Hearing added successfully", newHearing);
   } catch (error) {
-    console.error("Error adding hearing:", error);
+    console.error("Error adding hearing:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -53,7 +53,7 @@ const getHearing = async (req, res) => {
     }
     return sendResponse(res, 200, "Hearing fetched successfully", data);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in get hearing:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -89,7 +89,7 @@ const updateHearing = async (req, res) => {
     }
     return sendResponse(res, 200, "Hearing updated successfully", hearing);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in update hearing:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -115,7 +115,7 @@ const calculateTotalAmount = async (hearing, res) => {
 
     return totalAmount;
   } catch (error) {
-    console.error("Error calculating total amount:", error);
+    console.error("Error calculating total amount:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };

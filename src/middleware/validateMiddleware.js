@@ -24,7 +24,7 @@ const validate = (schema) => async (req, res, next) => {
 
     next();
   } catch (err) {
-    console.error("Server error:", err);
+    console.error("Error while validating:>>>>>", err);
     return sendResponse(res, 500, "Server error");
   }
 };

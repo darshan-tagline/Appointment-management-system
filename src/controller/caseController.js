@@ -13,7 +13,7 @@ const viewCase = async (req, res) => {
     }
     return sendResponse(res, 200, "Case fetched successfully", caseData);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in view case:>>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -28,7 +28,7 @@ const getCase = async (req, res) => {
     }
     return sendResponse(res, 200, "Case fetched successfully", doctorData);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in get case:>>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };

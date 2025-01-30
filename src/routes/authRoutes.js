@@ -2,7 +2,6 @@ const express = require("express");
 const validate = require("../middleware/validateMiddleware");
 const loginValidatorSchema = require("../validators/loginValidation");
 const patientValidatorSchema = require("../validators/patientValidation");
-const passport = require("passport");
 const {
   googleAuth,
   googleAuthCallback,

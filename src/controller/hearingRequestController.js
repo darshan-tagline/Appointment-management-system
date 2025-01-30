@@ -37,7 +37,7 @@ const addHearingRequest = async (req, res) => {
       newHearingRequest
     );
   } catch (error) {
-    console.error("Error creating hearing request:", error);
+    console.error("Error creating hearing request:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -52,7 +52,7 @@ const getHearing = async (req, res) => {
     }
     return sendResponse(res, 200, "Hearing fetched successfully", data);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in get hearing request:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -68,7 +68,7 @@ const getHearingRequests = async (req, res) => {
     }
     return sendResponse(res, 200, "Hearing fetched successfully", caseData);
   } catch (error) {
-    console.log("Server Error", error);
+    console.log("Error in get hearing requests:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -91,7 +91,7 @@ const updateHearingStatus = async (req, res) => {
       updatedHearingRequest
     );
   } catch (error) {
-    console.error("Error updating hearing status:", error);
+    console.error("Error updating hearing status:>>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
