@@ -7,8 +7,8 @@ const authRouter = require("./authRoutes");
 const router = express.Router();
 
 router.use("/auth", authRouter);
-router.use("/admin", authorize(["admin"]), adminRouter);
-router.use("/doctor", authorize(["doctor"]), doctorRouter);
-router.use("/patient", authorize(["patient"]), patientRouter);
+router.use("/admin", authorize("admin"), adminRouter);
+router.use("/doctor", authorize("doctor"), doctorRouter);
+router.use("/patient", authorize("patient"), patientRouter);
 
 module.exports = router;

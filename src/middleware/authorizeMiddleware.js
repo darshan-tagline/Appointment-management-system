@@ -2,7 +2,7 @@ const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
 const { findUser } = require("../service/userServices");
 
-const authorize = (requiredRoles = []) => {
+const authorize = (requiredRole) => {
   return async (req, res, next) => {
     try {
       const authHeader = req.header("Authorization");
@@ -20,7 +20,7 @@ const authorize = (requiredRoles = []) => {
 
       let decoded;
       try {
-        decoded =  tokenVarification(token);
+        decoded = tokenVarification(token);
       } catch (jwtError) {
         console.error("JWT verification failed:", jwtError.message);
         return sendResponse(res, 401, "Invalid or expired JWT token.");
@@ -32,7 +32,7 @@ const authorize = (requiredRoles = []) => {
         return sendResponse(res, 404, "User not found.");
       }
 
-      if (requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
+      if (requiredRole && user.role !== requiredRole) {
         return sendResponse(
           res,
           403,
