@@ -20,7 +20,7 @@ const authorize = (requiredRoles = []) => {
 
       let decoded;
       try {
-        decoded = await tokenVarification(token);
+        decoded =  tokenVarification(token);
       } catch (jwtError) {
         console.error("JWT verification failed:", jwtError.message);
         return sendResponse(res, 401, "Invalid or expired JWT token.");

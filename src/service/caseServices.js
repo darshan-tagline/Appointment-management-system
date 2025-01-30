@@ -1,55 +1,30 @@
 const Case = require("../model/caseModel");
 
 const addNewCase = async (caseData) => {
-  try {
-    return Case.create(caseData);
-  } catch (error) {
-    console.log("error adding case", error);
-    return null;
-  }
+  return Case.create(caseData);
 };
 const findCasesByDoctor = async (data) => {
-  try {
-    const cases = await Case.find(data)
-      .populate("patientId", "name email")
-      .populate("appointmentId", "date time symptoms");
+  const cases = await Case.find(data)
+    .populate("patientId", "name email")
+    .populate("appointmentId", "date time symptoms");
 
-    return cases;
-  } catch (error) {
-    console.log("error finding cases by doctor", error);
-    return null;
-  }
+  return cases;
 };
 
 const findCasesByPatient = async (data) => {
-  try {
-    const cases = await Case.find(data)
-      .populate("doctorId", "name email")
-      .populate("appointmentId", "date time symptoms");
+  const cases = await Case.find(data)
+    .populate("doctorId", "name email")
+    .populate("appointmentId", "date time symptoms");
 
-    return cases;
-  } catch (error) {
-    console.log("error finding cases by patient", error);
-    return null;
-  }
+  return cases;
 };
 
 const updateCaseStatus = async (id, status) => {
-  try {
-    return Case.findByIdAndUpdate(id, { status }, { new: true });
-  } catch (error) {
-    console.log("error updating case status", error);
-    return null;
-  }
+  return Case.findByIdAndUpdate(id, { status }, { new: true });
 };
 
 const findCase = async (data) => {
-  try {
-    return Case.findOne(data);
-  } catch (error) {
-    console.log("error finding case", error);
-    return null;
-  }
+  return Case.findOne(data);
 };
 
 module.exports = {

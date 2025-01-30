@@ -1,39 +1,27 @@
 const Hearing = require("../model/hearingModel");
 
 const addNewHearing = async (hearingData) => {
-  try {
-    return Hearing.create(hearingData);
-  } catch (error) {
-    console.log("error in creating hearing", error);
-    return null;
-  }
+  return Hearing.create(hearingData);
 };
 
 const findHearing = async (data) => {
-  try {
-    return Hearing.findOne(data)
-      .populate({
-        path: "prescription",
-        select: "dosage duration medicineId",
-      })
-      .populate({
-        path: "caseId",
-        select: "patientId appointmentId",
-      })
-      .exec();
-  } catch (error) {
-    console.log("error in finding hearing", error);
-    return null;
-  }
+  return Hearing.findOne(data)
+    .populate({
+      path: "prescription",
+      select: "quantity duration medicineId",
+      populate: {
+        path: "medicineId",
+        select: "name price",
+      },
+    })
+    .populate({
+      path: "caseId",
+      select: "patientId appointmentId",
+    });
 };
 
 const updateHearingData = async (id, status) => {
-  try {
-    return Hearing.findByIdAndUpdate(id, { status }, { new: true });
-  } catch (error) {
-    console.log("error in updating hearing", error);
-    return null;
-  }
+  return Hearing.findByIdAndUpdate(id, { status }, { new: true });
 };
 
 module.exports = {
