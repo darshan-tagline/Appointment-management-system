@@ -20,17 +20,16 @@ const modifyMedicine = async (id, medicine) => {
 };
 
 const searchMedicine = async (data) => {
-  const query = {};
   const page = Number(data.page) || 1;
   const limit = Number(data.limit) || 10;
   const skip = (page - 1) * limit;
 
-  data.name && (query.name = { $regex: data.name, $options: "i" });
-  data.price && (query.price = Number(data.price));
-
   return Medicine.aggregate([
     {
-      $match: query,
+      $match: {
+        ...(data.name && { name: { $regex: data.name, $options: "i" } }),
+        ...(data.price && { price: Number(data.price) }),
+      },
     },
     {
       $skip: skip,

@@ -7,7 +7,5 @@ const tokenGeneration = (payload, expiresIn = "1d") => {
 const tokenVarification = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
-const tokenDecode = (token) => {
-  return jwt.decode(token, process.env.JWT_SECRET);
-};
-module.exports = { tokenGeneration, tokenVarification, tokenDecode };
+
+module.exports = { tokenGeneration, tokenVarification };

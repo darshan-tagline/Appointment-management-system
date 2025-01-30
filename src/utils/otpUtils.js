@@ -1,4 +1,5 @@
 const { updateUser } = require("../service/userServices");
+const { subject, mailText } = require("./comman");
 
 const sendEmail = require("./sendMail");
 
@@ -19,14 +20,10 @@ const sendOTP = async (email) => {
         otpExpires,
       }
     );
-
     await sendEmail(
       patient.email,
-      "Verify Your Account: OTP Inside",
-      `Dear User,
-Your One-Time Password (OTP) for verification is: ${otp}.
-Please enter this OTP to complete your request.
-Note: This OTP is valid for a limited time and can only be used once.`
+      subject.PATIENT,
+      mailText.PATIENT.replace("${otp}", otp)
     );
   } catch (error) {
     console.error("Error sending OTP:", error);

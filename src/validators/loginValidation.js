@@ -11,15 +11,6 @@ const loginValidatorSchema = Joi.object({
     "string.empty": "Password is required.",
     "any.required": "Password is a mandatory field.",
   }),
-  role: Joi.string()
-    .valid("admin", "doctor", "patient")
-    .lowercase()
-    .required()
-    .messages({
-      "any.only": "Role must be one of the following: admin, doctor, patient.",
-      "string.empty": "Role is required.",
-      "any.required": "Role is a mandatory field.",
-    }),
 });
 
 module.exports = loginValidatorSchema;

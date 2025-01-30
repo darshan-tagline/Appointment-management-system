@@ -25,13 +25,21 @@ const addMedicine = async (req, res) => {
 const getAllMedicines = async (req, res) => {
   try {
     const queryParams = req.query;
-    let medicines;
-    medicines = await searchMedicine(queryParams);
+    let medicines = await searchMedicine(queryParams);
 
     if (medicines.length === 0) {
       return sendResponse(res, 404, "No medicines found with the given name");
     }
-    return sendResponse(res, 200, "Medicines fetched successfully", medicines);
+    return sendResponse(res, 200, "Medicines fetched successfully", {
+      pagination: {
+        page: Number(queryParams.page) || 1,
+        limit: Number(queryParams.limit) || 10,
+        totalDocuments: medicines.length,
+        totalPages:
+          Math.ceil(medicines.length / Number(queryParams.limit)) || 1,
+      },
+      medicines,
+    });
   } catch (error) {
     console.log("Error in get all medicines:>>>>>", error);
     return sendResponse(res, 500, "Server error");
@@ -56,7 +64,7 @@ const updateMedicine = async (req, res) => {
     const { id } = req.params;
     const { name, price } = req.body;
     const alreadyExist = await findMedicine({ name });
-    if (alreadyExist && alreadyExist._id.toString() !== id) {
+    if (alreadyExist) {
       return sendResponse(res, 400, "Medicine already exists");
     }
     const updatedMedicine = await modifyMedicine(id, {

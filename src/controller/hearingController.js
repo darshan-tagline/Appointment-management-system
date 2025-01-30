@@ -24,11 +24,7 @@ const addHearing = async (req, res) => {
       const medicine = prescription[i];
       const validMedicine = await findMedicine({ _id: medicine.medicineId });
       if (!validMedicine) {
-        return sendResponse(
-          res,
-          400,
-          `Medicine does not exist in the database.`
-        );
+        return sendResponse(res, 400, `Medicine not found.`);
       }
     }
     const newHearing = await addNewHearing({

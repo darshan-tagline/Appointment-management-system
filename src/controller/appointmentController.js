@@ -31,14 +31,13 @@ const createAppointment = async (req, res) => {
       return sendResponse(res, 400, "timeSlot slot already booked");
     }
 
-    const newAppointment = {
+    const booking = await addNewAppoinment({
       patientId: patientId,
       doctorId,
       date,
       timeSlot,
       symptoms,
-    };
-    const booking = await addNewAppoinment(newAppointment);
+    });
 
     return sendResponse(res, 200, "Appointment created successfully", booking);
   } catch (error) {
@@ -108,13 +107,11 @@ const updateAppointment = async (req, res) => {
         "Appointment already exists for this appointment and this appointment is already approved"
       );
     }
-    const newCase = {
+    const caseCreated = await addNewCase({
       appointmentId: appointment._id,
       patientId: appointment.patientId,
       doctorId: appointment.doctorId,
-    };
-
-    const caseCreated = await addNewCase(newCase);
+    });
 
     return sendResponse(
       res,

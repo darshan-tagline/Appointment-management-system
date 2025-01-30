@@ -18,16 +18,17 @@ const modifyCategory = async (id, category) => {
 };
 
 const searchCategory = async (data) => {
-  const query = {};
   const page = Number(data.page) || 1;
   const limit = Number(data.limit) || 10;
   const skip = (page - 1) * limit;
-  data.name && (query.name = { $regex: data.name, $options: "i" });
-  data.description &&
-    (query.description = { $regex: data.description, $options: "i" });
   return Category.aggregate([
     {
-      $match: query,
+      $match: {
+        ...(data.name && { name: { $regex: data.name, $options: "i" } }),
+        ...(data.description && {
+          description: { $regex: data.description, $options: "i" },
+        }),
+      },
     },
     {
       $skip: skip,

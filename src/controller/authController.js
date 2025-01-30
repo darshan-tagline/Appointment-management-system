@@ -5,16 +5,17 @@ const { tokenGeneration } = require("../utils/token");
 const { sendOTP } = require("../utils/otpUtils");
 const { passwordHash } = require("../utils/passwordUtils");
 const { findUser, updateUser, addNewUser } = require("../service/userServices");
+const { role } = require("../utils/comman");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-    const user = await findUser({ email, role });
+    const { email, password } = req.body;
+    const user = await findUser({ email });
     if (!user) {
       return sendResponse(res, 401, "Invalid email or password");
     }
 
-    if (role === "patient" && user.isVerified === false) {
+    if (user.role === "patient" && user.isVerified === false) {
       return sendResponse(
         res,
         401,
@@ -47,12 +48,12 @@ const patientSignUp = async (req, res) => {
       return sendResponse(res, 400, "Patient already exists");
     }
 
-    const hashedPassword =  passwordHash(password);
+    const hashedPassword = passwordHash(password);
     const patient = await addNewUser({
       name,
       email,
       password: hashedPassword,
-      role: "patient",
+      role: role.PATIENT,
       isVerified: false,
     });
 

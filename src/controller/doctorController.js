@@ -9,6 +9,7 @@ const {
   updateUser,
   removeUser,
 } = require("../service/userServices");
+const { subject, mailText, role } = require("../utils/comman");
 
 const createDoctor = async (req, res) => {
   try {
@@ -28,23 +29,15 @@ const createDoctor = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: "doctor",
+      role: role.DOCTOR,
       categoryId,
     });
-    const subject = "Welcome to the System - Your Login Details";
-    const textContent = `
-      Dear Dr. ${name},
 
-      Your account has been created.
+    const textContent = mailText.DOCTOR.replace("${name}", name)
+      .replace("${email}", email)
+      .replace("${password}", password);
 
-      Email: ${email}
-      Password: ${password}
-
-      Best regards,
-      Your System Team
-    `;
-
-    await sendEmail(email, subject, textContent);
+    await sendEmail(email, subject.DOCTOR, textContent);
 
     return sendResponse(res, 201, "Doctor created successfully");
   } catch (error) {
@@ -56,13 +49,19 @@ const createDoctor = async (req, res) => {
 const getAllDoctors = async (req, res) => {
   try {
     const queryParams = req.query;
-    let doctors;
-
-    doctors = await searchUser("doctor", queryParams);
+    let doctors = await searchUser("doctor", queryParams);
     if (doctors.length === 0) {
       return sendResponse(res, 404, "No doctors found with the given name");
     }
-    return sendResponse(res, 200, "Doctors fetched successfully", doctors);
+    return sendResponse(res, 200, "Doctors fetched successfully", {
+      pagination: {
+        page: Number(queryParams.page) || 1,
+        limit: Number(queryParams.limit) || 10,
+        totalDocuments: doctors.length,
+        totalPages: Math.ceil(doctors.length / Number(queryParams.limit)) || 1,
+      },
+      doctors,
+    });
   } catch (error) {
     console.log("Error in get all doctors:>>>>", error);
     return sendResponse(res, 500, "Server error");
@@ -99,7 +98,7 @@ const updateDoctor = async (req, res) => {
     }
     if (email !== doctorData.email) {
       const alreadyExist = await findUser({ email, role: "doctor" });
-      if (alreadyExist && alreadyExist._id.toString() !== id) {
+      if (alreadyExist) {
         return sendResponse(
           res,
           400,

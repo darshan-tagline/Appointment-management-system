@@ -13,13 +13,13 @@ const searchUser = async (role, data) => {
   const page = Number(data.page) || 1;
   const limit = Number(data.limit) || 10;
   const skip = (page - 1) * limit;
-
-  data.name && (query.name = { $regex: data.name, $options: "i" });
-  data.email && (query.email = { $regex: data.email, $options: "i" });
-
   return User.aggregate([
     {
-      $match: query,
+      $match: {
+        role,
+        ...(data.name && { name: { $regex: data.name, $options: "i" } }),
+        ...(data.email && { email: { $regex: data.email, $options: "i" } }),
+      },
     },
     {
       $skip: skip,
