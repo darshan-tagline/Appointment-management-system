@@ -9,7 +9,7 @@ const {
   updateUser,
   removeUser,
 } = require("../service/userServices");
-const { subject, mailText, role } = require("../utils/comman");
+const { userRole, emailText, emailSubject } = require("../utils/comman");
 
 const createDoctor = async (req, res) => {
   try {
@@ -24,20 +24,20 @@ const createDoctor = async (req, res) => {
     if (!validCategory) {
       return sendResponse(res, 400, "Category not found");
     }
-    const hashedPassword = await passwordHash(password);
+    const hashedPassword = passwordHash(password);
     await addNewUser({
       name,
       email,
       password: hashedPassword,
-      role: role.DOCTOR,
+      role: userRole.DOCTOR,
       categoryId,
     });
 
-    const textContent = mailText.DOCTOR.replace("${name}", name)
+    const textContent = emailText.DOCTOR.replace("${name}", name)
       .replace("${email}", email)
       .replace("${password}", password);
 
-    await sendEmail(email, subject.DOCTOR, textContent);
+    await sendEmail(email, emailSubject.DOCTOR, textContent);
 
     return sendResponse(res, 201, "Doctor created successfully");
   } catch (error) {
@@ -49,19 +49,11 @@ const createDoctor = async (req, res) => {
 const getAllDoctors = async (req, res) => {
   try {
     const queryParams = req.query;
-    let doctors = await searchUser("doctor", queryParams);
+    let doctors = await searchUser(userRole.DOCTOR, queryParams);
     if (doctors.length === 0) {
       return sendResponse(res, 404, "No doctors found with the given name");
     }
-    return sendResponse(res, 200, "Doctors fetched successfully", {
-      pagination: {
-        page: Number(queryParams.page) || 1,
-        limit: Number(queryParams.limit) || 10,
-        totalDocuments: doctors.length,
-        totalPages: Math.ceil(doctors.length / Number(queryParams.limit)) || 1,
-      },
-      doctors,
-    });
+    return sendResponse(res, 200, "Doctors fetched successfully", doctors);
   } catch (error) {
     console.log("Error in get all doctors:>>>>", error);
     return sendResponse(res, 500, "Server error");
@@ -71,7 +63,7 @@ const getAllDoctors = async (req, res) => {
 const getDoctorById = async (req, res) => {
   try {
     const { id } = req.params;
-    const doctor = await findUser({ _id: id, role: "doctor" });
+    const doctor = await findUser({ _id: id, role: userRole.DOCTOR });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -86,7 +78,7 @@ const updateDoctor = async (req, res) => {
     let newPassword = null;
     const { id } = req.params;
     const { name, email, categoryId, password } = req.body;
-    const doctorData = await findUser({ _id: id, role: "doctor" });
+    const doctorData = await findUser({ _id: id, role: userRole.DOCTOR });
     if (!doctorData) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -97,7 +89,7 @@ const updateDoctor = async (req, res) => {
       }
     }
     if (email !== doctorData.email) {
-      const alreadyExist = await findUser({ email, role: "doctor" });
+      const alreadyExist = await findUser({ email, role: userRole.DOCTOR });
       if (alreadyExist) {
         return sendResponse(
           res,
@@ -111,7 +103,7 @@ const updateDoctor = async (req, res) => {
     }
 
     const doctor = await updateUser(
-      { _id: id, role: "doctor" },
+      { _id: id, role: userRole.DOCTOR },
       {
         name,
         email,
@@ -130,7 +122,7 @@ const updateDoctor = async (req, res) => {
 const deleteDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const doctor = await removeUser({ _id: id, role: "doctor" });
+    const doctor = await removeUser({ _id: id, role: userRole.DOCTOR });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");
     }

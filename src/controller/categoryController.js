@@ -26,20 +26,15 @@ const getAllCategories = async (req, res) => {
   try {
     const queryParams = req.query;
     let categories = await searchCategory(queryParams);
-
     if (categories.length === 0) {
       return sendResponse(res, 404, "No categories found with the given name");
     }
-    return sendResponse(res, 200, "Categories fetched successfully", {
-      pagination: {
-        page: Number(queryParams.page) || 1,
-        limit: Number(queryParams.limit) || 10,
-        totalDocuments: categories.length,
-        totalPages:
-          Math.ceil(categories.length / Number(queryParams.limit)) || 1,
-      },
-      categories,
-    });
+    return sendResponse(
+      res,
+      200,
+      "Categories fetched successfully",
+      categories
+    );
   } catch (error) {
     console.log("Error in get all categories:>>>>>", error);
     return sendResponse(res, 500, "Server error");

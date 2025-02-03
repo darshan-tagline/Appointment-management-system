@@ -9,11 +9,10 @@ const addNewUser = async (user) => {
 };
 
 const searchUser = async (role, data) => {
-  const query = { role };
   const page = Number(data.page) || 1;
   const limit = Number(data.limit) || 10;
   const skip = (page - 1) * limit;
-  return User.aggregate([
+  const result = await User.aggregate([
     {
       $match: {
         role,
@@ -22,12 +21,30 @@ const searchUser = async (role, data) => {
       },
     },
     {
-      $skip: skip,
+      $facet: {
+        metadata: [{ $count: "totalDocuments" }],
+        doctors: [{ $skip: skip }, { $limit: limit }],
+      },
     },
     {
-      $limit: limit,
+      $project: {
+        totalDocuments: { $arrayElemAt: ["$metadata.totalDocuments", 0] },
+        doctors: 1,
+      },
     },
   ]);
+  const totalDocuments = result[0]?.totalDocuments || 0;
+  const totalPages = Math.ceil(totalDocuments / limit);
+
+  return {
+    pagination: {
+      page,
+      limit,
+      totalDocuments,
+      totalPages,
+    },
+    doctors: result[0]?.doctors || [],
+  };
 };
 
 const updateUser = async (query, updates) => {

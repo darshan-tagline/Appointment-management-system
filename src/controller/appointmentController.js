@@ -7,12 +7,16 @@ const { findCase, addNewCase } = require("../service/caseServices");
 const sendResponse = require("../utils/responseUtils");
 const { findBooking, findTimeSlot } = require("../service/appoinmentServices");
 const { findUser } = require("../service/userServices");
+const { userRole } = require("../utils/comman");
 
 const createAppointment = async (req, res) => {
   try {
     const { doctorId, date, timeSlot, symptoms } = req.body;
     const patientId = req.user._id;
-    const validDoctorId = await findUser({ _id: doctorId, role: "doctor" });
+    const validDoctorId = await findUser({
+      _id: doctorId,
+      role: userRole.DOCTOR,
+    });
     if (!validDoctorId) {
       return sendResponse(res, 404, "Doctor not found");
     }
@@ -53,8 +57,7 @@ const getAppoinment = async (req, res) => {
     if (!userData) {
       return sendResponse(res, 404, "Patient not found");
     }
-    const patientId = userData._id;
-    const appointments = await findAppointment({ patientId });
+    const appointments = await findAppointment({ patientId: userData._id });
     if (!appointments || appointments.length === 0) {
       return sendResponse(res, 404, "No appointments found.");
     }
@@ -104,7 +107,7 @@ const updateAppointment = async (req, res) => {
       return sendResponse(
         res,
         400,
-        "Appointment already exists for this appointment and this appointment is already approved"
+        "Appointment already exists for this user and this appointment is already approved"
       );
     }
     const caseCreated = await addNewCase({

@@ -5,7 +5,7 @@ const { tokenGeneration } = require("../utils/token");
 const { sendOTP } = require("../utils/otpUtils");
 const { passwordHash } = require("../utils/passwordUtils");
 const { findUser, updateUser, addNewUser } = require("../service/userServices");
-const { role } = require("../utils/comman");
+const { userRole } = require("../utils/comman");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const login = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ const login = async (req, res) => {
       return sendResponse(res, 401, "Invalid email or password");
     }
 
-    if (user.role === "patient" && user.isVerified === false) {
+    if (user.role === userRole.PATIENT && user.isVerified === false) {
       return sendResponse(
         res,
         401,
@@ -53,7 +53,7 @@ const patientSignUp = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role.PATIENT,
+      role: userRole.PATIENT,
       isVerified: false,
     });
 
@@ -68,7 +68,7 @@ const patientSignUp = async (req, res) => {
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const patient = await findUser({ email, role: "patient" });
+    const patient = await findUser({ email, role: userRole.PATIENT });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }
@@ -119,7 +119,6 @@ passport.use(
     async (req, accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
-
         let patient = await findUser({ email });
         if (patient) {
           const token = tokenGeneration(patient._id, "7d");
@@ -129,12 +128,12 @@ passport.use(
         const newPatient = await addNewUser({
           name: profile.displayName,
           email,
-          role: "patient",
+          role: userRole.PATIENT,
           isVerified: true,
         });
 
         const token = tokenGeneration(
-          { id: newPatient._id, role: "patient" },
+          { id: newPatient._id, role: userRole.PATIENT },
           "7d"
         );
         return done(null, { ...newPatient.toObject(), accessToken: token });

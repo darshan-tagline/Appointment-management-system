@@ -30,16 +30,7 @@ const getAllMedicines = async (req, res) => {
     if (medicines.length === 0) {
       return sendResponse(res, 404, "No medicines found with the given name");
     }
-    return sendResponse(res, 200, "Medicines fetched successfully", {
-      pagination: {
-        page: Number(queryParams.page) || 1,
-        limit: Number(queryParams.limit) || 10,
-        totalDocuments: medicines.length,
-        totalPages:
-          Math.ceil(medicines.length / Number(queryParams.limit)) || 1,
-      },
-      medicines,
-    });
+    return sendResponse(res, 200, "Medicines fetched successfully", medicines);
   } catch (error) {
     console.log("Error in get all medicines:>>>>>", error);
     return sendResponse(res, 500, "Server error");

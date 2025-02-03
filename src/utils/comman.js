@@ -1,15 +1,15 @@
-const role = Object.freeze({
+const userRole = Object.freeze({
   ADMIN: "admin",
   DOCTOR: "doctor",
   PATIENT: "patient",
 });
 
-const subject = Object.freeze({
+const emailSubject = Object.freeze({
   DOCTOR: "Welcome to the System - Your Login Details",
   PATIENT: "Verify Your Account: OTP Inside",
 });
 
-const mailText = Object.freeze({
+const emailText = Object.freeze({
   DOCTOR: `
       Dear Dr. ${"${name}"},
 
@@ -27,4 +27,4 @@ Please enter this OTP to complete your request.
 Note: This OTP is valid for a 10 Minutes and can only be used once.`,
 });
 
-module.exports = { role , subject, mailText };
+module.exports = { userRole, emailSubject, emailText };

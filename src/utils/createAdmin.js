@@ -1,4 +1,5 @@
 const { addNewUser, findUser } = require("../service/userServices");
+const { userRole } = require("./comman");
 const { passwordHash } = require("./passwordUtils");
 
 const createAdmin = async () => {
@@ -8,10 +9,11 @@ const createAdmin = async () => {
     const password = process.env.ADMIN_PASSWORD;
     const existingAdmin = await findUser({
       email,
-      role: "admin",
+      role: userRole.ADMIN,
     });
     if (existingAdmin) {
       console.log("Admin already exists");
+      return;
     }
     const hashedPassword = passwordHash(password);
 
@@ -19,7 +21,7 @@ const createAdmin = async () => {
       name,
       email,
       password: hashedPassword,
-      role: "admin",
+      role: userRole.ADMIN,
     });
     console.log("Admin created successfully:", admin);
   } catch (err) {

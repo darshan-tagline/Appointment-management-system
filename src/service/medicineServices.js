@@ -24,7 +24,7 @@ const searchMedicine = async (data) => {
   const limit = Number(data.limit) || 10;
   const skip = (page - 1) * limit;
 
-  return Medicine.aggregate([
+  const result = await Medicine.aggregate([
     {
       $match: {
         ...(data.name && { name: { $regex: data.name, $options: "i" } }),
@@ -32,12 +32,29 @@ const searchMedicine = async (data) => {
       },
     },
     {
-      $skip: skip,
+      $facet: {
+        metadata: [{ $count: "totalDocuments" }],
+        medicines: [{ $skip: skip }, { $limit: limit }],
+      },
     },
     {
-      $limit: limit,
+      $project: {
+        totalDocuments: { $arrayElemAt: ["$metadata.totalDocuments", 0] },
+        medicines: 1,
+      },
     },
   ]);
+  const totalDocuments = result[0]?.totalDocuments || 0;
+  const totalPages = Math.ceil(totalDocuments / limit);
+  return {
+    pagination: {
+      page,
+      limit,
+      totalDocuments,
+      totalPages,
+    },
+    medicines: result[0]?.medicines || [],
+  };
 };
 
 module.exports = {

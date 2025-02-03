@@ -1,5 +1,5 @@
 const { updateUser } = require("../service/userServices");
-const { subject, mailText } = require("./comman");
+const { emailSubject, emailText } = require("./comman");
 
 const sendEmail = require("./sendMail");
 
@@ -22,8 +22,8 @@ const sendOTP = async (email) => {
     );
     await sendEmail(
       patient.email,
-      subject.PATIENT,
-      mailText.PATIENT.replace("${otp}", otp)
+      emailSubject.PATIENT,
+      emailText.PATIENT.replace("${otp}", otp)
     );
   } catch (error) {
     console.error("Error sending OTP:", error);
