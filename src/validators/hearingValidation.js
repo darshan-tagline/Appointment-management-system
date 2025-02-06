@@ -41,9 +41,39 @@ const hearingValidatorSchema = Joi.object({
 });
 
 const hearingUpdateValidatorSchema = Joi.object({
-  status: Joi.string().valid("resolved", "In Progress").required().messages({
-    "string.valid": "Status must be either 'resolved' or 'In Progress'.",
+  status: Joi.string()
+    .lowercase()
+    .valid("resolved", "in progress")
+    .required()
+    .messages({
+      "string.valid": "Status must be either 'resolved' or 'in progress'.",
+    }),
+  description: Joi.string().optional().messages({
+    "string.base": "Description must be a string.",
   }),
+  prescription: Joi.array()
+    .items(
+      Joi.object({
+        medicineId: Joi.string().required().messages({
+          "string.base": "Medicine ID must be a string.",
+          "any.required": "Medicine ID is required.",
+        }),
+        quantity: Joi.number().integer().positive().required().messages({
+          "number.base": "Quantity must be a number.",
+          "number.integer": "Quantity must be an integer.",
+          "number.positive": "Quantity must be a positive number.",
+          "any.required": "Quantity is required.",
+        }),
+        duration: Joi.string().required().messages({
+          "string.base": "Duration must be a string.",
+          "any.required": "Duration is required.",
+        }),
+      })
+    )
+    .optional()
+    .messages({
+      "array.base": "Prescription must be an array of objects.",
+    }),
 });
 
 module.exports = { hearingValidatorSchema, hearingUpdateValidatorSchema };

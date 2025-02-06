@@ -10,6 +10,7 @@ const {
   removeUser,
 } = require("../service/userServices");
 const { userRole, emailText, emailSubject } = require("../utils/comman");
+const { findCasesByDoctor } = require("../service/caseServices");
 
 const createDoctor = async (req, res) => {
   try {
@@ -122,6 +123,11 @@ const updateDoctor = async (req, res) => {
 const deleteDoctor = async (req, res) => {
   try {
     const { id } = req.params;
+    const casee = await findCasesByDoctor({ doctorId: id });
+
+    if (!casee.length === 0) {
+      return sendResponse(res, 400, "Doctor cannot be deleted");
+    }
     const doctor = await removeUser({ _id: id, role: userRole.DOCTOR });
     if (!doctor) {
       return sendResponse(res, 404, "Doctor not found");

@@ -6,6 +6,7 @@ const {
   modifyMedicine,
   searchMedicine,
 } = require("../service/medicineServices");
+const { findHearing } = require("../service/hearingServices");
 
 const addMedicine = async (req, res) => {
   try {
@@ -82,6 +83,11 @@ const updateMedicine = async (req, res) => {
 const deleteMedicine = async (req, res) => {
   try {
     const { id } = req.params;
+    const hearing = await findHearing({ "prescription.medicineId": id });    
+    if (hearing) {
+      return sendResponse(res, 400, "Medicine cannot be deleted");
+    }
+
     const medicine = await removeMedicine(id);
     if (!medicine) {
       return sendResponse(res, 404, "Medicine not found");

@@ -5,7 +5,7 @@ const {
   findHearing,
   updateHearingData,
 } = require("../service/hearingServices");
-const { createBill, findBill } = require("../service/billServices");
+const { createBill, findBill, updateBill } = require("../service/billServices");
 const { findMedicine } = require("../service/medicineServices");
 
 const addHearing = async (req, res) => {
@@ -57,25 +57,71 @@ const getHearing = async (req, res) => {
 const updateHearing = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    const hearing = await updateHearingData(id, status);
+    const hearingbyId = await findHearing({ _id: id });
+
+    if (!hearingbyId) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+
+    const {
+      status,
+      description = hearingbyId.description,
+      prescription = hearingbyId.prescription,
+    } = req.body;
+
+    if (Array.isArray(prescription) && prescription.length > 0) {
+      for (const medicine of prescription) {
+        const validMedicine = await findMedicine({ _id: medicine.medicineId });
+        if (!validMedicine) {
+          return sendResponse(res, 400, `Medicine not found.`);
+        }
+      }
+    }
+
+    const hearing = await updateHearingData(id, {
+      status,
+      description,
+      prescription,
+    });
 
     if (!hearing) {
       return sendResponse(res, 404, "Hearing not found");
     }
-    if (hearing.status === "resolved") {
-      const existingBill = await findBill({ hearingId: id });
 
+    const existingBill = await findBill({ hearingId: id });
+
+    if (status === "in-progress") {
+      return sendResponse(res, 200, "Hearing updated successfully", hearing);
+    }
+
+    if (status === "resolved") {
       if (existingBill) {
-        return sendResponse(
-          res,
-          400,
-          "Hearing already resolved and bill exists"
-        );
+        const isPrescriptionChanged =
+          hearingbyId.prescription.length !== prescription.length ||
+          hearingbyId.prescription.some((oldItem) => {
+            const newItem = prescription.find(
+              (p) => p.medicineId === oldItem.medicineId
+            );
+            return !newItem || newItem.quantity !== oldItem.quantity;
+          });
+
+        if (isPrescriptionChanged) {
+          const totalAmount = await calculateTotalAmount(hearing);
+          const updatedBill = await updateBill(existingBill._id, {
+            totalAmount,
+          });
+
+          return sendResponse(res, 200, "Hearing updated and bill updated", {
+            hearing,
+            updatedBill,
+          });
+        }
+
+        return sendResponse(res, 200, "Hearing updated successfully", hearing);
       }
+
       const caseId = hearing.caseId._id;
       const totalAmount = await calculateTotalAmount(hearing);
-
       const bill = await createBill(caseId, hearing._id, totalAmount);
 
       return sendResponse(res, 200, "Hearing updated and bill created", {
@@ -83,6 +129,7 @@ const updateHearing = async (req, res) => {
         bill,
       });
     }
+
     return sendResponse(res, 200, "Hearing updated successfully", hearing);
   } catch (error) {
     console.log("Error in update hearing:>>>>>", error);
@@ -90,29 +137,34 @@ const updateHearing = async (req, res) => {
   }
 };
 
-const calculateTotalAmount = async (hearing, res) => {
+const calculateTotalAmount = async (hearing) => {
   try {
     const doctorFee = 100;
     let totalMedicineCost = 0;
+    const medicineMap = new Map();
 
-    for (let i = 0; i < hearing.prescription.length; i++) {
-      const medicine = hearing.prescription[i];
-
-      const medicineDetails = await findMedicine(medicine.medicineId);
-
+    for (const medicine of hearing.prescription) {
+      if (medicineMap.has(medicine.medicineId)) {
+        medicineMap.set(
+          medicine.medicineId,
+          medicineMap.get(medicine.medicineId) + medicine.quantity
+        );
+      } else {
+        medicineMap.set(medicine.medicineId, medicine.quantity);
+      }
+    }
+    for (const [medicineId, quantity] of medicineMap) {
+      const medicineDetails = await findMedicine(medicineId);
       if (!medicineDetails) {
         throw new Error(`Medicine not found`);
       }
-
-      totalMedicineCost += medicineDetails.price * medicine.quantity;
+      totalMedicineCost += medicineDetails.price * quantity;
     }
 
-    const totalAmount = totalMedicineCost + doctorFee;
-
-    return totalAmount;
+    return totalMedicineCost + doctorFee;
   } catch (error) {
     console.error("Error calculating total amount:>>>>>", error);
-    return sendResponse(res, 500, "Server error");
+    throw new Error("Failed to calculate total amount");
   }
 };
 

@@ -4,7 +4,7 @@ const addNewHearing = async (hearingData) => {
   return Hearing.create(hearingData);
 };
 
-const findHearing = async (data) => {
+const findHearing = async (data) => {  
   return Hearing.findOne(data)
     .populate({
       path: "prescription",
@@ -20,8 +20,8 @@ const findHearing = async (data) => {
     });
 };
 
-const updateHearingData = async (id, status) => {
-  return Hearing.findByIdAndUpdate(id, { status }, { new: true });
+const updateHearingData = async (id, data) => {
+    return Hearing.findByIdAndUpdate(id, data, { new: true });
 };
 
 module.exports = {

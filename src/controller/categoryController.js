@@ -6,6 +6,8 @@ const {
   findCategory,
   searchCategory,
 } = require("../service/categoryServices");
+const { findUser } = require("../service/userServices");
+const { userRole } = require("../utils/comman");
 
 const addCategory = async (req, res) => {
   try {
@@ -86,6 +88,13 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
+    const doctor = await findUser({
+      role: userRole.DOCTOR,
+      categoryId: id,
+    });
+    if (doctor) {
+      return sendResponse(res, 400, "Category cannot be deleted");
+    }
     const category = await removeCategory(id);
     if (!category) {
       return sendResponse(res, 404, "Category not found");
