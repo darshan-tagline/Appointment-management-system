@@ -1,7 +1,13 @@
 const express = require("express");
 const validate = require("../middleware/validateMiddleware");
-const loginValidatorSchema = require("../validators/loginValidation");
-const patientValidatorSchema = require("../validators/patientValidation");
+const {
+  loginValidatorSchema,
+  patientValidatorSchema,
+  otpValidatorSchema,
+  changePasswordValidatorSchema,
+  emailValidatorSchema,
+  passwordValidatorSchema,
+} = require("../validators/authValidation");
 const {
   googleAuth,
   googleAuthCallback,
@@ -11,12 +17,39 @@ const {
   login,
   patientSignUp,
   validateOTP,
+  resendOtp,
+  forgotPassword,
+  resetPassword,
+  forgotPasswordVarifyOTP,
+  changePassword,
 } = require("../controller/authController");
 const authRouter = express.Router();
 
 authRouter.post("/login", validate(loginValidatorSchema), login);
 authRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
-authRouter.post("/validateOTP", validateOTP);
+authRouter.post("/resend-otp", validate(emailValidatorSchema), resendOtp);
+authRouter.post("/validate-otp", validate(otpValidatorSchema), validateOTP);
+authRouter.post(
+  "/forgot-password",
+  validate(emailValidatorSchema),
+  forgotPassword
+);
+
+authRouter.post(
+  "/forgot-password/validate-otp",
+  validate(otpValidatorSchema),
+  forgotPasswordVarifyOTP
+);
+authRouter.post(
+  "/reset-password",
+  validate(emailValidatorSchema.concat(passwordValidatorSchema)),
+  resetPassword
+);
+authRouter.post(
+  "/change-password",
+  validate(changePasswordValidatorSchema),
+  changePassword
+);
 authRouter.get("/google", googleAuth);
 authRouter.get("/google/callback", googleMiddlware, googleAuthCallback);
 

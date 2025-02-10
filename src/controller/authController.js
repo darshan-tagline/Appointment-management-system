@@ -72,7 +72,6 @@ const validateOTP = async (req, res) => {
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }
-
     if (new Date() > patient.otpExpires) {
       return sendResponse(res, 400, "OTP has expired.");
     }
@@ -99,6 +98,132 @@ const validateOTP = async (req, res) => {
     });
   } catch (error) {
     console.error("Error validating OTP:>>>>>", error);
+    return sendResponse(res, 500, "Server error.");
+  }
+};
+
+const resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const patient = await findUser({ email, role: userRole.PATIENT });
+    if (!patient) {
+      return sendResponse(res, 404, "Patient not found.");
+    }
+    const currentTime = new Date();
+    if (patient.otpExpires && currentTime < new Date(patient.otpExpires)) {
+      return sendResponse(res, 400, "OTP has not expired yet.");
+    }
+    await sendOTP(patient.email);
+    return sendResponse(res, 200, "OTP resent successfully.");
+  } catch (error) {
+    console.error("Error resending OTP:>>>>>", error);
+    return sendResponse(res, 500, "Server error.");
+  }
+};
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const patient = await findUser({ email, role: userRole.PATIENT });
+    if (!patient) {
+      return sendResponse(res, 404, "Patient not found.");
+    }
+    await updateUser(
+      { email },
+      {
+        isVerified: false,
+      }
+    );
+    await sendOTP(patient.email);
+    return sendResponse(res, 200, "OTP sent successfully.");
+  } catch (error) {
+    console.error("Error resending OTP:>>>>>", error);
+    return sendResponse(res, 500, "Server error.");
+  }
+};
+
+const forgotPasswordVarifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const patient = await findUser({ email, role: userRole.PATIENT });
+    if (!patient) {
+      return sendResponse(res, 404, "Patient not found.");
+    }
+    if (new Date() > patient.otpExpires) {
+      return sendResponse(res, 400, "OTP has expired.");
+    }
+    if (patient.otp !== otp) {
+      return sendResponse(res, 400, "Invalid OTP.");
+    }
+
+    await updateUser(
+      { email },
+      {
+        isVerified: true,
+        otp: null,
+        otpExpires: null,
+      }
+    );
+    return sendResponse(res, 200, "OTP validated successfully.");
+  } catch (error) {
+    console.error("Error resending OTP:>>>>>", error);
+    return sendResponse(res, 500, "Server error.");
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const patient = await findUser({ email, role: userRole.PATIENT });
+    if (!patient) {
+      return sendResponse(res, 404, "Patient not found.");
+    }
+    if (patient.isVerified === false) {
+      return sendResponse(
+        res,
+        400,
+        "You are not verified. Please verify your OTP."
+      );
+    }
+    const hashedPassword = passwordHash(newPassword);
+    await updateUser(
+      { email },
+      {
+        password: hashedPassword,
+        otp: null,
+        otpExpires: null,
+      }
+    );
+    return sendResponse(res, 200, "Password reset successfully.");
+  } catch (error) {
+    console.error("Error resting password :>>>>>", error);
+    return sendResponse(res, 500, "Server error.");
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    const { email, oldPassword, newPassword } = req.body;
+    const patient = await findUser({ email, role: userRole.PATIENT });
+    if (!patient) {
+      return sendResponse(res, 404, "Patient not found.");
+    }
+    const isPasswordMatch = await passwordCompare(
+      oldPassword,
+      patient.password
+    );    
+    if (!isPasswordMatch) {
+      return sendResponse(res, 400, "Invalid password.");
+    }
+    const hashedPassword = passwordHash(newPassword);
+    await updateUser(
+      { email },
+      {
+        password: hashedPassword,
+      }
+    );
+    return sendResponse(res, 200, "Password reset successfully.");
+  } catch (error) {
+    console.error("Error resending OTP:>>>>>", error);
     return sendResponse(res, 500, "Server error.");
   }
 };
@@ -143,4 +268,13 @@ passport.use(
     }
   )
 );
-module.exports = { login, patientSignUp, validateOTP };
+module.exports = {
+  login,
+  patientSignUp,
+  validateOTP,
+  resendOtp,
+  forgotPassword,
+  forgotPasswordVarifyOTP,
+  changePassword,
+  resetPassword,
+};
