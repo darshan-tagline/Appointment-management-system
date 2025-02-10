@@ -33,7 +33,10 @@ const login = async (req, res) => {
       "7d"
     );
 
-    return sendResponse(res, 200, "Login successful", { accessToken });
+    return sendResponse(res, 200, "Login successful", {
+      accessToken,
+      role: user.role,
+    });
   } catch (error) {
     console.log("Error in login:>>>>", error);
     return sendResponse(res, 500, "Server error");
@@ -111,7 +114,11 @@ const resendOtp = async (req, res) => {
     }
     const currentTime = new Date();
     if (patient.otpExpires && currentTime < new Date(patient.otpExpires)) {
-      return sendResponse(res, 400, "OTP has not expired yet.");
+      return sendResponse(
+        res,
+        400,
+        "You can request OTP again after some time."
+      );
     }
     await sendOTP(patient.email);
     return sendResponse(res, 200, "OTP resent successfully.");
@@ -210,7 +217,7 @@ const changePassword = async (req, res) => {
     const isPasswordMatch = await passwordCompare(
       oldPassword,
       patient.password
-    );    
+    );
     if (!isPasswordMatch) {
       return sendResponse(res, 400, "Invalid password.");
     }
