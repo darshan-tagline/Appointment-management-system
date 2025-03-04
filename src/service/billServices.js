@@ -1,7 +1,7 @@
 const Bill = require("../model/billModel");
 
-const createBill = async (caseId, hearingId, precption,totalAmount) => {
-  return Bill.create({ caseId, hearingId, precption,totalAmount });
+const createBill = async (data) => {
+  return Bill.create(data);
 };
 
 const findBill = async (data) => {

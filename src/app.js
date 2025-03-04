@@ -2,14 +2,13 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
-const connectDB = require("../config/db");
+const { connectDB } = require("../config/db");
 const passport = require("passport");
 const sendResponse = require("./utils/responseUtils");
 const router = require("./routes/router");
-const passportConfig = require("./controller/authController");
+require("./controller/authController");
 const session = require("express-session");
 const port = process.env.PORT || 3000;
-// const createAdmin = require("./utils/createAdmin");
 
 app.use(
   cors({
@@ -19,8 +18,6 @@ app.use(
 );
 
 connectDB();
-
-// createAdmin();
 
 app.use(express.json());
 app.use(
@@ -36,15 +33,15 @@ app.use(passport.session());
 
 app.use("/api", router);
 
-app.get("/", (req, res) => {
-  return sendResponse(res, 200, "Server is online");
+app.get("/", (_req, res) => {
+  return sendResponse(res, 200, "AMS - Server is online");
 });
 
-app.use("*", (req, res) => {
+app.use("*", (_req, res) => {
   return sendResponse(res, 404, "Page not found");
 });
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   console.error(err.stack);
   return sendResponse(res, 500, err.message || "Server error");
 });

@@ -2,8 +2,11 @@ const sendResponse = require("../utils/responseUtils");
 const { tokenVarification } = require("../utils/token");
 const { findUser } = require("../service/userServices");
 
-const authorize = (requiredRole) => async (req, res, next) => {
+const authorize = (requiredRoles) => async (req, res, next) => {
   try {
+    if (!Array.isArray(requiredRoles)) {
+      requiredRoles = [requiredRoles];
+    }    
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return sendResponse(res, 403, "Access denied. No token provided.");
@@ -19,11 +22,12 @@ const authorize = (requiredRole) => async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = tokenVarification(token);
+      decoded = tokenVarification(token); 
     } catch (jwtError) {
       console.error("JWT verification failed:", jwtError.message);
       return sendResponse(res, 401, "Invalid or expired JWT token.");
     }
+
     const { id, role } = decoded.payload;
     const user = await findUser({ _id: id, role });
 
@@ -31,7 +35,7 @@ const authorize = (requiredRole) => async (req, res, next) => {
       return sendResponse(res, 404, "User not found.");
     }
 
-    if (requiredRole && user.role !== requiredRole) {
+    if (!requiredRoles.includes(user.role)) {
       return sendResponse(res, 403, "Access denied. Insufficient permissions.");
     }
 

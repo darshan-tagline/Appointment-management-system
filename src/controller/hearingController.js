@@ -89,11 +89,8 @@ const updateHearing = async (req, res) => {
     }
 
     const existingBill = await findBill({ hearingId: id });
-
-    if (status === "in-progress") {
-      return sendResponse(res, 200, "Hearing updated successfully", hearing);
-    }
-
+    
+    
     if (status === "resolved") {
       if (existingBill) {
         const isPrescriptionChanged =
@@ -123,12 +120,12 @@ const updateHearing = async (req, res) => {
 
       const caseId = hearing.caseId._id;
       const totalAmount = await calculateTotalAmount(hearing);
-      const bill = await createBill(
+      const bill = await createBill({
         caseId,
-        hearing._id,
+        hearingId: hearing._id,
         prescription,
-        totalAmount
-      );
+        totalAmount,
+      });
 
       return sendResponse(res, 200, "Hearing updated and bill created", {
         hearing,

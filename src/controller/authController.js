@@ -131,7 +131,7 @@ const resendOtp = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const patient = await findUser({ email, role: userRole.PATIENT });
+    const patient = await findUser({ email, role: req.user.role });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }
@@ -152,7 +152,7 @@ const forgotPassword = async (req, res) => {
 const forgotPasswordVarifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const patient = await findUser({ email, role: userRole.PATIENT });
+    const patient = await findUser({ email, role: req.user.role });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }
@@ -181,7 +181,7 @@ const forgotPasswordVarifyOTP = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    const patient = await findUser({ email, role: userRole.PATIENT });
+    const patient = await findUser({ email, role: req.user.role });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }
@@ -210,7 +210,7 @@ const resetPassword = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const { email, oldPassword, newPassword } = req.body;
-    const patient = await findUser({ email, role: userRole.PATIENT });
+    const patient = await findUser({ email, role: req.user.role });
     if (!patient) {
       return sendResponse(res, 404, "Patient not found.");
     }

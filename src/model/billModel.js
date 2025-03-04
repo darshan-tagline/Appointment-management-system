@@ -12,7 +12,7 @@ const billSchema = new mongoose.Schema(
       ref: "Hearing",
       required: true,
     },
-    precption: [
+    prescription: [
       {
         medicineId: {
           type: mongoose.Schema.Types.ObjectId,
