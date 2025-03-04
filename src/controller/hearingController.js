@@ -109,6 +109,7 @@ const updateHearing = async (req, res) => {
           const totalAmount = await calculateTotalAmount(hearing);
           const updatedBill = await updateBill(existingBill._id, {
             totalAmount,
+            prescription,
           });
 
           return sendResponse(res, 200, "Hearing updated and bill updated", {
@@ -122,7 +123,12 @@ const updateHearing = async (req, res) => {
 
       const caseId = hearing.caseId._id;
       const totalAmount = await calculateTotalAmount(hearing);
-      const bill = await createBill(caseId, hearing._id, totalAmount);
+      const bill = await createBill(
+        caseId,
+        hearing._id,
+        prescription,
+        totalAmount
+      );
 
       return sendResponse(res, 200, "Hearing updated and bill created", {
         hearing,

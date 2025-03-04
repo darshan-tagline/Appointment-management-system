@@ -12,6 +12,23 @@ const billSchema = new mongoose.Schema(
       ref: "Hearing",
       required: true,
     },
+    precption: [
+      {
+        medicineId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Medicine",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+        duration: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     totalAmount: {
       type: Number,
       required: true,

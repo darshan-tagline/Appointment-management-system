@@ -228,9 +228,9 @@ const changePassword = async (req, res) => {
         password: hashedPassword,
       }
     );
-    return sendResponse(res, 200, "Password reset successfully.");
+    return sendResponse(res, 200, "Password changed successfully.");
   } catch (error) {
-    console.error("Error resending OTP:>>>>>", error);
+    console.error("Error password chnaging :>>>>>", error);
     return sendResponse(res, 500, "Server error.");
   }
 };
