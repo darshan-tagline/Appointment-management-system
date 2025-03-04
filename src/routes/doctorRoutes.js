@@ -15,23 +15,33 @@ const {
 const { appointmentRouterForDoctor } = require("./appointmentRoutes");
 const hearingRouter = require("./hearingRoutes");
 const { hearingRequestRouter } = require("./hearingRequestRoutes");
-
+const authorize = require("../middleware/authorizeMiddleware");
 const adminDoctorRouter = express.Router();
 const doctorRouter = express.Router();
 
-adminDoctorRouter.post("/", validate(doctorValidatorSchema), createDoctor);
-adminDoctorRouter.get("/", getAllDoctors);
-adminDoctorRouter.get("/:id", getDoctorById);
+adminDoctorRouter.post(
+  "/",
+  authorize("admin"),
+  validate(doctorValidatorSchema),
+  createDoctor
+);
+adminDoctorRouter.get("/", authorize("admin"), getAllDoctors);
+adminDoctorRouter.get("/:id", authorize("admin"), getDoctorById);
 adminDoctorRouter.put(
   "/:id",
+  authorize("admin"),
   validate(doctorUpdateValidatorSchema),
   updateDoctor
 );
-adminDoctorRouter.delete("/:id", deleteDoctor);
+adminDoctorRouter.delete("/:id", authorize("admin"), deleteDoctor);
 
-doctorRouter.use("/appointment", appointmentRouterForDoctor);
-doctorRouter.use("/hearing", hearingRouter);
-doctorRouter.use("/hearingrequest", hearingRequestRouter);
-doctorRouter.get("/case", getCase);
+doctorRouter.use(
+  "/appointment",
+  authorize("doctor"),
+  appointmentRouterForDoctor
+);
+doctorRouter.use("/hearing", authorize("doctor"), hearingRouter);
+doctorRouter.use("/hearingrequest", authorize("doctor"), hearingRequestRouter);
+doctorRouter.get("/case", authorize("doctor"), getCase);
 
 module.exports = { adminDoctorRouter, doctorRouter };
