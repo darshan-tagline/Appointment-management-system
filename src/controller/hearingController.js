@@ -4,6 +4,7 @@ const {
   addNewHearing,
   findHearing,
   updateHearingData,
+  findAllHearings,
 } = require("../service/hearingServices");
 const { createBill, findBill, updateBill } = require("../service/billServices");
 const { findMedicine } = require("../service/medicineServices");
@@ -11,8 +12,8 @@ const { findMedicine } = require("../service/medicineServices");
 const addHearing = async (req, res) => {
   try {
     const { caseId, description, prescription } = req.body;
-    const validCase = await findCase({ _id: caseId });
-    if (!validCase) {
+    const { doctorId } = await findCase({ _id: caseId });
+    if (!doctorId) {
       return sendResponse(res, 400, `case does not exist.`);
     }
 
@@ -29,6 +30,7 @@ const addHearing = async (req, res) => {
     }
     const newHearing = await addNewHearing({
       caseId,
+      doctorId,
       description,
       prescription,
     });
@@ -89,8 +91,7 @@ const updateHearing = async (req, res) => {
     }
 
     const existingBill = await findBill({ hearingId: id });
-    
-    
+
     if (status === "resolved") {
       if (existingBill) {
         const isPrescriptionChanged =
@@ -171,8 +172,58 @@ const calculateTotalAmount = async (hearing) => {
   }
 };
 
+const getAllHearings = async (req, res) => {
+  try {
+    const queryParams = req.query;
+    const hearings = await findAllHearings(
+      [
+        {
+          $lookup: {
+            from: "medicines",
+            localField: "prescription.medicineId",
+            foreignField: "_id",
+            as: "medicineDetails",
+          },
+        },
+        {
+          $unwind: "$medicineDetails",
+        },
+        {
+          $project: {
+            _id: 1,
+            caseId: 1,
+            description: 1,
+            status: 1,
+            prescription: {
+              $map: {
+                input: "$prescription",
+                as: "item",
+                in: {
+                  medicineId: "$$item.medicineId",
+                  medicineDetails: {
+                    name: "$medicineDetails.name",
+                    price: "$medicineDetails.price",
+                  },
+                  quantity: "$$item.quantity",
+                  duration: "$$item.duration",
+                },
+              },
+            },
+          },
+        },
+      ],
+      queryParams
+    );
+    if (!hearings) return sendResponse(res, 204, "no hearing found");
+    return sendResponse(res, 200, "All Hearings", hearings);
+  } catch (error) {
+    console.log("getAllHearings error:======>>", error);
+    return sendResponse(res, 500, "Internal server error");
+  }
+};
 module.exports = {
   addHearing,
   getHearing,
   updateHearing,
+  getAllHearings,
 };

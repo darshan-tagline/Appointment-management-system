@@ -31,6 +31,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("*", (req, res, next) => {
+  console.log("request url :>> ", req.originalUrl);
+  next();
+});
 app.use("/api", router);
 
 app.get("/", (_req, res) => {

@@ -2,12 +2,12 @@ const {
   findAppointment,
   updateStatus,
   addNewAppoinment,
+  findAllAppinments,
 } = require("../service/appoinmentServices");
 const { findCase, addNewCase } = require("../service/caseServices");
 const sendResponse = require("../utils/responseUtils");
 const { findBooking, findTimeSlot } = require("../service/appoinmentServices");
 const { findUser } = require("../service/userServices");
-const { userRole } = require("../utils/comman");
 
 const createAppointment = async (req, res) => {
   try {
@@ -15,7 +15,6 @@ const createAppointment = async (req, res) => {
     const patientId = req.user._id;
     const validDoctorId = await findUser({
       _id: doctorId,
-      role: userRole.DOCTOR,
     });
     if (!validDoctorId) {
       return sendResponse(res, 404, "Doctor not found");
@@ -128,9 +127,65 @@ const updateAppointment = async (req, res) => {
   }
 };
 
+const getAllAppointment = async (req, res) => {
+  try {
+    const queryParams = req.query;
+    const appointments = await findAllAppinments(
+      [
+        {
+          $lookup: {
+            from: "users",
+            localField: "patientId",
+            foreignField: "_id",
+            as: "patient",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "doctorId",
+            foreignField: "_id",
+            as: "doctor",
+          },
+        },
+        {
+          $unwind: "$patient",
+        },
+        {
+          $unwind: "$doctor",
+        },
+        {
+          $project: {
+            patient: {
+              _id: 1,
+              name: 1,
+              email: 1,
+            },
+            doctor: {
+              _id: 1,
+              name: 1,
+              email: 1,
+            },
+            status: 1, 
+            date: 1,
+            timeSlot: 1, 
+            symptoms: 1,
+          },
+        },
+      ],
+      queryParams
+    );
+    if (!appointments) return sendResponse(res, 204, "No appointments Found");
+    return sendResponse(res, 200, "All appointments", appointments);
+  } catch (error) {
+    console.log("Error getting all appointments ==>>>", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
 module.exports = {
   getAppointmentForDoctor,
   updateAppointment,
   createAppointment,
   getAppoinment,
+  getAllAppointment,
 };

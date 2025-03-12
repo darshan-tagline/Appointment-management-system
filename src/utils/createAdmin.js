@@ -13,7 +13,7 @@ const createAdmin = async (req, res) => {
     if (existingAdmin) {
       return sendResponse(res, 400, "Admin already exists");
     }
-    const hashedPassword = passwordHash(password);
+    const hashedPassword = await passwordHash(password);
 
     const admin = await addNewUser({
       name,

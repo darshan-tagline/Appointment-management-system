@@ -4,6 +4,7 @@ const {
   getHearing,
   updateHearing,
   addHearing,
+  getAllHearings,
 } = require("../controller/hearingController");
 const {
   hearingUpdateValidatorSchema,
@@ -12,7 +13,8 @@ const {
 
 const hearingRouter = express.Router();
 
-hearingRouter.post("/", validate(hearingValidatorSchema),addHearing);
+// hearingRouter.get("/", getAllHearings);
+hearingRouter.post("/", validate(hearingValidatorSchema), addHearing);
 hearingRouter.get("/:id", getHearing);
 hearingRouter.put(
   "/:id",

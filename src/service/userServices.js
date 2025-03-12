@@ -1,4 +1,6 @@
 const User = require("../model/userModel");
+const { userRole } = require("../utils/comman");
+const sendResponse = require("../utils/responseUtils");
 
 const findUser = async (criteria) => {
   return User.findOne(criteria);
@@ -23,16 +25,26 @@ const searchUser = async (role, data) => {
     {
       $facet: {
         metadata: [{ $count: "totalDocuments" }],
-        doctors: [{ $skip: skip }, { $limit: limit }],
+        users: [{ $skip: skip }, { $limit: limit }],
       },
     },
     {
-      $project: {
+      $set: {
         totalDocuments: { $arrayElemAt: ["$metadata.totalDocuments", 0] },
-        doctors: 1,
       },
     },
+    {
+      $unset: [
+        "metadata",
+        "users.createdAt",
+        "users.updatedAt",
+        "users.otp",
+        "users.otpExpires",
+        "users.password"
+      ], 
+    },
   ]);
+
   const totalDocuments = result[0]?.totalDocuments || 0;
   const totalPages = Math.ceil(totalDocuments / limit);
 
@@ -43,7 +55,7 @@ const searchUser = async (role, data) => {
       totalDocuments,
       totalPages,
     },
-    doctors: result[0]?.doctors || [],
+    users: result[0]?.users || [],
   };
 };
 
@@ -54,4 +66,20 @@ const updateUser = async (query, updates) => {
 const removeUser = async (removeData) => {
   return User.findByIdAndDelete(removeData);
 };
-module.exports = { findUser, addNewUser, searchUser, updateUser, removeUser };
+
+const findAllPatient = async (req, res) => {
+  const queryParams = req.query;
+  const allPatient = await searchUser(userRole.PATIENT, queryParams);
+  console.log(allPatient);
+
+  if (!allPatient) return sendResponse(res, 204, "No patient found");
+  return sendResponse(res, 200, "All patient", allPatient);
+};
+module.exports = {
+  findUser,
+  addNewUser,
+  searchUser,
+  updateUser,
+  removeUser,
+  findAllPatient,
+};

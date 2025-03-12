@@ -15,7 +15,7 @@ const login = async (req, res) => {
       return sendResponse(res, 401, "Invalid email or password");
     }
 
-    if (user.role === userRole.PATIENT && user.isVerified === false) {
+    if (user.isVerified === false) {
       return sendResponse(
         res,
         401,
@@ -23,7 +23,7 @@ const login = async (req, res) => {
       );
     }
 
-    const isPasswordMatch = await passwordCompare(password, user.password);
+    const isPasswordMatch = passwordCompare(password, user.password);
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
@@ -50,8 +50,7 @@ const patientSignUp = async (req, res) => {
     if (alreadyExists) {
       return sendResponse(res, 400, "Patient already exists");
     }
-
-    const hashedPassword = passwordHash(password);
+    const hashedPassword = await passwordHash(password);
     const patient = await addNewUser({
       name,
       email,
@@ -71,9 +70,9 @@ const patientSignUp = async (req, res) => {
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const patient = await findUser({ email, role: userRole.PATIENT });
+    const patient = await findUser({ email });
     if (!patient) {
-      return sendResponse(res, 404, "Patient not found.");
+      return sendResponse(res, 404, "User not found.");
     }
     if (new Date() > patient.otpExpires) {
       return sendResponse(res, 400, "OTP has expired.");
@@ -108,9 +107,9 @@ const validateOTP = async (req, res) => {
 const resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
-    const patient = await findUser({ email, role: userRole.PATIENT });
+    const patient = await findUser({ email });
     if (!patient) {
-      return sendResponse(res, 404, "Patient not found.");
+      return sendResponse(res, 404, "User not found.");
     }
     const currentTime = new Date();
     if (patient.otpExpires && currentTime < new Date(patient.otpExpires)) {
@@ -131,9 +130,9 @@ const resendOtp = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const patient = await findUser({ email, role: req.user.role });
+    const patient = await findUser({ email });
     if (!patient) {
-      return sendResponse(res, 404, "Patient not found.");
+      return sendResponse(res, 404, "User not found.");
     }
     await updateUser(
       { email },
@@ -152,9 +151,9 @@ const forgotPassword = async (req, res) => {
 const forgotPasswordVarifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const patient = await findUser({ email, role: req.user.role });
+    const patient = await findUser({ email, isVerified: false });
     if (!patient) {
-      return sendResponse(res, 404, "Patient not found.");
+      return sendResponse(res, 404, "User not found.");
     }
     if (new Date() > patient.otpExpires) {
       return sendResponse(res, 400, "OTP has expired.");
@@ -180,10 +179,10 @@ const forgotPasswordVarifyOTP = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
-    const patient = await findUser({ email, role: req.user.role });
+    const { email, password } = req.body;
+    const patient = await findUser({ email });
     if (!patient) {
-      return sendResponse(res, 404, "Patient not found.");
+      return sendResponse(res, 404, "User not found.");
     }
     if (patient.isVerified === false) {
       return sendResponse(
@@ -192,7 +191,7 @@ const resetPassword = async (req, res) => {
         "You are not verified. Please verify your OTP."
       );
     }
-    const hashedPassword = passwordHash(newPassword);
+    const hashedPassword = await passwordHash(password);
     await updateUser(
       { email },
       {
@@ -212,16 +211,13 @@ const changePassword = async (req, res) => {
     const { email, oldPassword, newPassword } = req.body;
     const patient = await findUser({ email, role: req.user.role });
     if (!patient) {
-      return sendResponse(res, 404, "Patient not found.");
+      return sendResponse(res, 404, "User not found.");
     }
-    const isPasswordMatch = await passwordCompare(
-      oldPassword,
-      patient.password
-    );
+    const isPasswordMatch = passwordCompare(oldPassword, patient.password);
     if (!isPasswordMatch) {
       return sendResponse(res, 400, "Invalid password.");
     }
-    const hashedPassword = passwordHash(newPassword);
+    const hashedPassword = await passwordHash(newPassword);
     await updateUser(
       { email },
       {

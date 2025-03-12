@@ -6,7 +6,7 @@ const authorize = (requiredRoles) => async (req, res, next) => {
   try {
     if (!Array.isArray(requiredRoles)) {
       requiredRoles = [requiredRoles];
-    }    
+    }
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return sendResponse(res, 403, "Access denied. No token provided.");
@@ -22,7 +22,7 @@ const authorize = (requiredRoles) => async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = tokenVarification(token); 
+      decoded = tokenVarification(token);
     } catch (jwtError) {
       console.error("JWT verification failed:", jwtError.message);
       return sendResponse(res, 401, "Invalid or expired JWT token.");

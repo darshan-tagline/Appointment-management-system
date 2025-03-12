@@ -25,7 +25,7 @@ const createDoctor = async (req, res) => {
     if (!validCategory) {
       return sendResponse(res, 400, "Category not found");
     }
-    const hashedPassword = passwordHash(password);
+    const hashedPassword = await passwordHash(password);
     await addNewUser({
       name,
       email,
@@ -100,7 +100,7 @@ const updateDoctor = async (req, res) => {
       }
     }
     if (password) {
-      newPassword = passwordHash(password);
+      newPassword = await passwordHash(password);
     }
 
     const doctor = await updateUser(

@@ -28,24 +28,21 @@ const authRouter = express.Router();
 
 authRouter.post("/login", validate(loginValidatorSchema), login);
 authRouter.post("/signup", validate(patientValidatorSchema), patientSignUp);
-authRouter.post("/resend-otp", validate(emailValidatorSchema), resendOtp);
 authRouter.post("/validate-otp", validate(otpValidatorSchema), validateOTP);
+authRouter.post("/resend-otp", validate(emailValidatorSchema), resendOtp);
 authRouter.post(
   "/forgot-password",
-  authorize(["patient", "doctor"]),
   validate(emailValidatorSchema),
   forgotPassword
 );
 
 authRouter.post(
   "/forgot-password/validate-otp",
-  authorize(["patient", "doctor"]),
   validate(otpValidatorSchema),
   forgotPasswordVarifyOTP
 );
 authRouter.post(
   "/reset-password",
-  authorize(["patient", "doctor"]),
   validate(emailValidatorSchema.concat(passwordValidatorSchema)),
   resetPassword
 );
