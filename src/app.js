@@ -31,7 +31,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("*", (req, res, next) => {
+app.use("*", (req, _res, next) => {
   console.log("request url :>> ", req.originalUrl);
   next();
 });

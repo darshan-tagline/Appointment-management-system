@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getHearingRequests,
   updateHearingStatus,
+  getAllHearingRequests,
 } = require("../controller/hearingRequestController");
 const validate = require("../middleware/validateMiddleware");
 const {
@@ -15,6 +16,7 @@ const {
 
 const hearingRequestRouter = express.Router();
 const hearingRequestRouterForPatient = express.Router();
+const hearingRequestRouterForAdmin = express.Router();
 
 hearingRequestRouter.get("/", getHearingRequests);
 hearingRequestRouter.put(
@@ -30,4 +32,9 @@ hearingRequestRouterForPatient.post(
   addHearingRequest
 );
 
-module.exports = { hearingRequestRouter, hearingRequestRouterForPatient };
+hearingRequestRouterForAdmin.get("/", getAllHearingRequests);
+module.exports = {
+  hearingRequestRouter,
+  hearingRequestRouterForPatient,
+  hearingRequestRouterForAdmin,
+};

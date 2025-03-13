@@ -16,9 +16,13 @@ const updateHearingRequest = async (id, data) => {
   return HearingRequest.findByIdAndUpdate(id, data, { new: true });
 };
 
+const findAllHearingRequest = async () => {
+  return HearingRequest.find();
+};
 module.exports = {
   createHearingRequest,
   getAllHearingRequest,
   findHearingRequest,
   updateHearingRequest,
+  findAllHearingRequest,
 };

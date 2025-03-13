@@ -28,7 +28,10 @@ const updateStatus = async (id, status) => {
   return Appointment.findOneAndUpdate({ _id: id }, { status }, { new: true });
 };
 
-const findAllAppinments = async (query, pagination) => {
+const findAllAppinments = async (
+  query,
+  pagination = { page: 1, limit: 10 }
+) => {
   const page = Number(pagination.page) || 1;
   const limit = Number(pagination.limit) || 10;
   const skip = (page - 1) * limit;
@@ -47,6 +50,10 @@ const findAllAppinments = async (query, pagination) => {
   };
 };
 
+const deleteAppoinment = async (id) => {
+  return Appointment.findOneAndDelete({ _id: id });
+};
+
 module.exports = {
   findBooking,
   findTimeSlot,
@@ -54,4 +61,5 @@ module.exports = {
   findAppointment,
   updateStatus,
   findAllAppinments,
+  deleteAppoinment,
 };

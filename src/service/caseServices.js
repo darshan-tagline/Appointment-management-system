@@ -23,6 +23,9 @@ const findCase = async (data) => {
   return Case.findOne(data);
 };
 
+const deleteCase = async (data) => {
+  return Case.deleteOne(data);
+}
 const findCases = async (query, pagination) => {
   const page = Number(pagination.page) || 1;
   const limit = Number(pagination.limit) || 10;
@@ -49,4 +52,5 @@ module.exports = {
   findCasesByPatient,
   findCase,
   findCases,
+  deleteCase,
 };

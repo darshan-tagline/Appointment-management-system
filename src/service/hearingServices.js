@@ -45,9 +45,14 @@ const findAllHearings = async (query, pagination) => {
   };
 };
 
+const removeHearing = async (id) => {
+  return Hearing.findByIdAndDelete(id);
+};
+
 module.exports = {
   findHearing,
   updateHearingData,
   addNewHearing,
   findAllHearings,
+  removeHearing,
 };

@@ -3,11 +3,13 @@ const {
   updateStatus,
   addNewAppoinment,
   findAllAppinments,
+  deleteAppoinment,
 } = require("../service/appoinmentServices");
-const { findCase, addNewCase } = require("../service/caseServices");
+const { findCase, addNewCase, deleteCase } = require("../service/caseServices");
 const sendResponse = require("../utils/responseUtils");
 const { findBooking, findTimeSlot } = require("../service/appoinmentServices");
 const { findUser } = require("../service/userServices");
+const { default: mongoose } = require("mongoose");
 
 const createAppointment = async (req, res) => {
   try {
@@ -99,6 +101,9 @@ const updateAppointment = async (req, res) => {
       return sendResponse(res, 404, "Appointment not found");
     }
     if (status === "rejected") {
+      // let data = await deleteCase({ appointmentId: id });
+      // console.log("case deleted", data);
+
       return sendResponse(res, 200, "Appointment is rejected", appointment);
     }
     const existingCase = await findCase({ appointmentId: id });
@@ -166,19 +171,53 @@ const getAllAppointment = async (req, res) => {
               name: 1,
               email: 1,
             },
-            status: 1, 
+            status: 1,
             date: 1,
-            timeSlot: 1, 
+            timeSlot: 1,
             symptoms: 1,
           },
         },
       ],
       queryParams
     );
-    if (!appointments) return sendResponse(res, 204, "No appointments Found");
+    if (appointments.length == 0)
+      return sendResponse(res, 204, "No appointments Found");
     return sendResponse(res, 200, "All appointments", appointments);
   } catch (error) {
     console.log("Error getting all appointments ==>>>", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const getAppointmentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointment = await findAppointment({ _id: id });
+    if (appointment.length == 0) {
+      return sendResponse(res, 404, "Appointment not found");
+    }
+    return sendResponse(
+      res,
+      200,
+      "Appointment fetched successfully",
+      appointment
+    );
+  } catch (error) {
+    console.log("Error in get appointment by id:>>>>", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const deleteAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointment = await deleteAppoinment(id);
+    if (!appointment) {
+      return sendResponse(res, 404, "Appointment not found");
+    }
+    return sendResponse(res, 200, "Appointment deleted successfully");
+  } catch (error) {
+    console.log("Error in delete appointment:>>>>", error);
     return sendResponse(res, 500, "Server error");
   }
 };
@@ -188,4 +227,6 @@ module.exports = {
   createAppointment,
   getAppoinment,
   getAllAppointment,
+  getAppointmentById,
+  deleteAppointment,
 };

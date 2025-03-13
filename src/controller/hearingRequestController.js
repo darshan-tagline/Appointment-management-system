@@ -1,10 +1,14 @@
 const sendResponse = require("../utils/responseUtils");
-const { findCasesByPatient, findCasesByDoctor } = require("../service/caseServices");
+const {
+  findCasesByPatient,
+  findCasesByDoctor,
+} = require("../service/caseServices");
 const {
   createHearingRequest,
   findHearingRequest,
   updateHearingRequest,
   getAllHearingRequest,
+  findAllHearingRequest,
 } = require("../service/hearingRequestServices");
 
 const addHearingRequest = async (req, res) => {
@@ -96,9 +100,27 @@ const updateHearingStatus = async (req, res) => {
   }
 };
 
+const getAllHearingRequests = async (req, res) => {
+  try {
+    const data = await findAllHearingRequest();
+    if (!data) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+    return sendResponse(
+      res,
+      200,
+      "Hearing Requests fetched successfully",
+      data
+    );
+  } catch (error) {
+    console.log("Error in get all hearing requests:>>>>>", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
 module.exports = {
   addHearingRequest,
   getHearing,
   getHearingRequests,
   updateHearingStatus,
+  getAllHearingRequests,
 };

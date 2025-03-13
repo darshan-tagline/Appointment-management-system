@@ -5,6 +5,7 @@ const {
   findHearing,
   updateHearingData,
   findAllHearings,
+  removeHearing,
 } = require("../service/hearingServices");
 const { createBill, findBill, updateBill } = require("../service/billServices");
 const { findMedicine } = require("../service/medicineServices");
@@ -188,6 +189,31 @@ const getAllHearings = async (req, res) => {
         {
           $unwind: "$medicineDetails",
         },
+
+        {
+          $lookup: {
+            from: "cases",
+            localField: "caseId",
+            foreignField: "_id",
+            as: "caseDetails",
+          },
+        },
+        {
+          $unwind: "$caseDetails",
+        },
+
+        {
+          $lookup: {
+            from: "appointments",
+            localField: "caseDetails.appointmentId",
+            foreignField: "_id",
+            as: "appointmentDetails",
+          },
+        },
+        {
+          $unwind: "$appointmentDetails",
+        },
+
         {
           $project: {
             _id: 1,
@@ -209,16 +235,46 @@ const getAllHearings = async (req, res) => {
                 },
               },
             },
+            appointmentDetails: 1,
           },
         },
       ],
       queryParams
     );
-    if (!hearings) return sendResponse(res, 204, "no hearing found");
+    if (hearings.length == 0) return sendResponse(res, 204, "no hearing found");
     return sendResponse(res, 200, "All Hearings", hearings);
   } catch (error) {
     console.log("getAllHearings error:======>>", error);
     return sendResponse(res, 500, "Internal server error");
+  }
+};
+
+const getHearingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const hearing = await findHearing({ _id: id });
+    if (!hearing) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+    return sendResponse(res, 200, "Hearing fetched successfully", hearing);
+  } catch (error) {
+    console.log("Error in get hearing:>>>>>", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
+
+const deleteHearing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const hearing = await removeHearing({ _id: id });    
+    if (!hearing) {
+      return sendResponse(res, 404, "Hearing not found");
+    }
+    await removeHearing(id);
+    return sendResponse(res, 200, "Hearing deleted successfully");
+  } catch (error) {
+    console.log("Error in delete hearing:>>>>>", error);
+    return sendResponse(res, 500, "Server error");
   }
 };
 module.exports = {
@@ -226,4 +282,6 @@ module.exports = {
   getHearing,
   updateHearing,
   getAllHearings,
+  getHearingById,
+  deleteHearing,
 };

@@ -13,7 +13,7 @@ const {
   doctorUpdateValidatorSchema,
 } = require("../validators/doctorValidation");
 const { appointmentRouterForDoctor } = require("./appointmentRoutes");
-const hearingRouter = require("./hearingRoutes");
+const { hearingRouter } = require("./hearingRoutes");
 const { hearingRequestRouter } = require("./hearingRequestRoutes");
 const authorize = require("../middleware/authorizeMiddleware");
 const adminDoctorRouter = express.Router();
