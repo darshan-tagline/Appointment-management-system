@@ -3,7 +3,7 @@ const sendResponse = require("../utils/responseUtils");
 const validate = (schema) => async (req, res, next) => {
   try {
     const dataToValidate = { ...req.body, ...req.query, ...req.params };
-
+   
     const { error } = schema.validate(dataToValidate, {
       abortEarly: false,
       stripUnknown: true,

@@ -12,29 +12,34 @@ const {
   hearingUpdateValidatorSchema,
   hearingValidatorSchema,
 } = require("../validators/hearingValidation");
+const { idValidatorSchema } = require("../validators/commonValidation");
 
 const hearingRouter = express.Router();
 const hearingRouterForAdmin = express.Router();
 
 // doctor
 hearingRouter.post("/", validate(hearingValidatorSchema), addHearing);
-hearingRouter.get("/:id", getHearing);
+hearingRouter.get("/:id", validate(idValidatorSchema), getHearing);
 hearingRouter.put(
   "/:id",
-  validate(hearingUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(hearingUpdateValidatorSchema)),
   updateHearing
 );
 
 // admin
 hearingRouterForAdmin.get("/", getAllHearings);
-hearingRouterForAdmin.get("/:id", getHearingById);
+hearingRouterForAdmin.get("/:id", validate(idValidatorSchema), getHearingById);
 hearingRouterForAdmin.put(
   "/:id",
-  validate(hearingUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(hearingUpdateValidatorSchema)),
   updateHearing
 );
 
-hearingRouterForAdmin.delete("/:id", deleteHearing);
+hearingRouterForAdmin.delete(
+  "/:id",
+  validate(idValidatorSchema),
+  deleteHearing
+);
 module.exports = {
   hearingRouter,
   hearingRouterForAdmin,

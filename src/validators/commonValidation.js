@@ -1,8 +1,9 @@
-const joi = require("joi");
+const Joi = require("joi");
 
-const idValidatorSchema = joi.string().trim().hex().length(24).required().messages({
-  "string.pattern.base": "ID must be a valid ObjectId.",
-  "any.required": "ID is required.",
+const idValidatorSchema = Joi.object({
+  id: Joi.string().hex().length(24).required().messages({
+    "string.pattern.base": `"id" must be a valid MongoDB ObjectId`,
+  }),
 });
 
 module.exports = { idValidatorSchema };

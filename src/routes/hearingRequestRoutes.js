@@ -13,18 +13,21 @@ const {
   getHearing,
   addHearingRequest,
 } = require("../controller/hearingRequestController");
+const { idValidatorSchema } = require("../validators/commonValidation");
 
 const hearingRequestRouter = express.Router();
 const hearingRequestRouterForPatient = express.Router();
 const hearingRequestRouterForAdmin = express.Router();
 
+//doctor 
 hearingRequestRouter.get("/", getHearingRequests);
 hearingRequestRouter.put(
   "/:id",
-  validate(hearingRequestUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(hearingRequestUpdateValidatorSchema)),
   updateHearingStatus
 );
 
+// patient
 hearingRequestRouterForPatient.get("/", getHearing);
 hearingRequestRouterForPatient.post(
   "/",
@@ -32,7 +35,14 @@ hearingRequestRouterForPatient.post(
   addHearingRequest
 );
 
+
+// admin
 hearingRequestRouterForAdmin.get("/", getAllHearingRequests);
+hearingRequestRouterForAdmin.put(
+  "/:id",
+  validate(idValidatorSchema.concat(hearingRequestUpdateValidatorSchema)),
+  updateHearingStatus
+);
 module.exports = {
   hearingRequestRouter,
   hearingRequestRouterForPatient,

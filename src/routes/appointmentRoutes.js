@@ -13,7 +13,7 @@ const {
   getAppointmentById,
   deleteAppointment,
 } = require("../controller/appointmentController");
-// const { idValidatorSchema } = require("../validators/commonValidation");
+const { idValidatorSchema } = require("../validators/commonValidation");
 const appoinmentRouter = express.Router();
 const appointmentRouterForDoctor = express.Router();
 const appointmentRouterForAdmin = express.Router();
@@ -30,7 +30,7 @@ appoinmentRouter.post(
 appointmentRouterForDoctor.get("/", getAppointmentForDoctor);
 appointmentRouterForDoctor.put(
   "/:id",
-  validate(appointmentUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(appointmentUpdateValidatorSchema)),
   updateAppointment
 );
 
@@ -38,16 +38,17 @@ appointmentRouterForDoctor.put(
 appointmentRouterForAdmin.get("/", getAllAppointment);
 appointmentRouterForAdmin.get(
   "/:id",
-  // validate(idValidatorSchema),
+  validate(idValidatorSchema),
   getAppointmentById
 );
 appointmentRouterForAdmin.put(
   "/:id",
-  validate(appointmentUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(appointmentUpdateValidatorSchema)),
   updateAppointment
 );
 appointmentRouterForAdmin.delete(
   "/:id",
+  validate(idValidatorSchema),
   deleteAppointment
 );
 module.exports = {
