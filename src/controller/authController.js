@@ -23,7 +23,8 @@ const login = async (req, res) => {
       );
     }
 
-    const isPasswordMatch = passwordCompare(password, user.password);
+    const isPasswordMatch = await passwordCompare(password, user.password);
+
     if (!isPasswordMatch) {
       return sendResponse(res, 401, "Invalid email or password");
     }
