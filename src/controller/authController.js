@@ -37,6 +37,9 @@ const login = async (req, res) => {
     return sendResponse(res, 200, "Login successful", {
       accessToken,
       role: user.role,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
     });
   } catch (error) {
     console.log("Error in login:>>>>", error);
@@ -98,6 +101,10 @@ const validateOTP = async (req, res) => {
 
     return sendResponse(res, 200, "OTP validated successfully.", {
       accessToken,
+      role: patient.role,
+      name: patient.name,
+      _id: patient._id,
+      email: patient.token,
     });
   } catch (error) {
     console.error("Error validating OTP:>>>>>", error);
