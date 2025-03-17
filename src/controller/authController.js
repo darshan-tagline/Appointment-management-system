@@ -214,7 +214,10 @@ const changePassword = async (req, res) => {
     if (!patient) {
       return sendResponse(res, 404, "User not found.");
     }
-    const isPasswordMatch = passwordCompare(oldPassword, patient.password);
+    const isPasswordMatch = await passwordCompare(
+      oldPassword,
+      patient.password
+    );
     if (!isPasswordMatch) {
       return sendResponse(res, 400, "Invalid password.");
     }
