@@ -34,14 +34,7 @@ const searchUser = async (role, data) => {
       },
     },
     {
-      $unset: [
-        "metadata",
-        "users.createdAt",
-        "users.updatedAt",
-        "users.otp",
-        "users.otpExpires",
-        "users.password"
-      ], 
+      $unset: ["metadata", "users.otp", "users.otpExpires", "users.password"],
     },
   ]);
 
