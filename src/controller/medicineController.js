@@ -56,7 +56,7 @@ const updateMedicine = async (req, res) => {
     const { id } = req.params;
     const { name, price } = req.body;
     const alreadyExist = await findMedicine({ name });
-    if (alreadyExist) {
+    if (name && alreadyExist && alreadyExist._id != id) {
       return sendResponse(res, 400, "Medicine already exists");
     }
     const updatedMedicine = await modifyMedicine(id, {
@@ -83,7 +83,7 @@ const updateMedicine = async (req, res) => {
 const deleteMedicine = async (req, res) => {
   try {
     const { id } = req.params;
-    const hearing = await findHearing({ "prescription.medicineId": id });    
+    const hearing = await findHearing({ "prescription.medicineId": id });
     if (hearing) {
       return sendResponse(res, 400, "Medicine cannot be deleted");
     }

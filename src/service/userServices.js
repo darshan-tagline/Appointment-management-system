@@ -73,9 +73,8 @@ const removeUser = async (removeData) => {
 const findAllPatient = async (req, res) => {
   const queryParams = req.query;
   const allPatient = await searchUser(userRole.PATIENT, queryParams);
-  console.log(allPatient);
-
-  if (!allPatient) return sendResponse(res, 204, "No patient found");
+  if (allPatient.length === 0)
+    return sendResponse(res, 204, "No patient found");
   return sendResponse(res, 200, "All patient", allPatient);
 };
 module.exports = {
