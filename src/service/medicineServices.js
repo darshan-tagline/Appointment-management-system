@@ -26,9 +26,18 @@ const searchMedicine = async (data) => {
 
   const result = await Medicine.aggregate([
     {
+      // $match: {
+      //   ...(data.name && { name: { $regex: data.name, $options: "i" } }),
+      //   ...(data.price && { price: Number(data.price) }),
+      // },
+
       $match: {
-        ...(data.name && { name: { $regex: data.name, $options: "i" } }),
-        ...(data.price && { price: Number(data.price) }),
+        ...(data.search && {
+          $or: [
+            { name: { $regex: data.search, $options: "i" } },
+            { price: Number(data.search) },
+          ],
+        }),
       },
     },
     {

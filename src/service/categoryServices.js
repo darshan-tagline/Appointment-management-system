@@ -24,9 +24,11 @@ const searchCategory = async (data) => {
   const result = await Category.aggregate([
     {
       $match: {
-        ...(data.name && { name: { $regex: data.name, $options: "i" } }),
-        ...(data.description && {
-          description: { $regex: data.description, $options: "i" },
+        ...(data.search && {
+          $or: [
+            { name: { $regex: data.search, $options: "i" } },
+            { description: { $regex: data.search, $options: "i" } },
+          ],
         }),
       },
     },
@@ -53,7 +55,7 @@ const searchCategory = async (data) => {
       totalPages,
     },
     categories: result[0]?.categories || [],
-  }
+  };
 };
 
 module.exports = {
