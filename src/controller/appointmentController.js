@@ -9,7 +9,6 @@ const { findCase, addNewCase, deleteCase } = require("../service/caseServices");
 const sendResponse = require("../utils/responseUtils");
 const { findBooking, findTimeSlot } = require("../service/appoinmentServices");
 const { findUser } = require("../service/userServices");
-const { default: mongoose } = require("mongoose");
 
 const createAppointment = async (req, res) => {
   try {
@@ -96,36 +95,54 @@ const updateAppointment = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const appointment = await updateStatus(id, status);
+
+    const appointment = await findAppointment({ _id: id });
     if (!appointment) {
       return sendResponse(res, 404, "Appointment not found");
     }
-    if (status === "rejected") {
-      // let data = await deleteCase({ appointmentId: id });
-      // console.log("case deleted", data);
+
+    const currentStatus = appointment[0].status;
+    if (currentStatus == "approved" && status == "approved") {
+      return sendResponse(res, 400, "Appointment is already approved");
+    }
+
+    if (currentStatus == "rejected" && status == "rejected") {
+      return sendResponse(res, 400, "Appointment is already rejected");
+    }
+
+    if (status == "rejected") {
+      await deleteCase({ appointmentId: id });
+
+      await updateStatus(id, "rejected");
 
       return sendResponse(res, 200, "Appointment is rejected", appointment);
     }
-    const existingCase = await findCase({ appointmentId: id });
-    if (existingCase) {
+
+    if (status == "approved") {
+      const existingCase = await findCase({ appointmentId: id });
+      if (existingCase) {
+        return sendResponse(
+          res,
+          400,
+          "Case already exists for this appointment"
+        );
+      }
+
+      const caseCreated = await addNewCase({
+        patientId: appointment[0].patientId,
+        doctorId: appointment[0].doctorId,
+        appointmentId: appointment[0]._id,
+      });
+
+      await updateStatus(id, "approved");
+
       return sendResponse(
         res,
-        400,
-        "Appointment already exists for this user and this appointment is already approved"
+        200,
+        "Appointment updated successfully and case created",
+        { appointment, caseCreated }
       );
     }
-    const caseCreated = await addNewCase({
-      appointmentId: appointment._id,
-      patientId: appointment.patientId,
-      doctorId: appointment.doctorId,
-    });
-
-    return sendResponse(
-      res,
-      200,
-      "Appointment updated successfully and case created",
-      { appointment, caseCreated }
-    );
   } catch (error) {
     console.log("Error updating appointment:>>>>", error);
     return sendResponse(res, 500, "Server error");

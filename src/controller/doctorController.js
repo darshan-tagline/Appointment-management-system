@@ -34,9 +34,9 @@ const createDoctor = async (req, res) => {
       categoryId,
     });
 
-    const textContent = emailText.DOCTOR.replace("${name}", name)
-      .replace("${email}", email)
-      .replace("${password}", password);
+    const textContent = emailText.DOCTOR(name, email, password);
+    // .replace("${email}", email)
+    // .replace("${password}", password);
 
     await sendEmail(email, emailSubject.DOCTOR, textContent);
 
@@ -51,7 +51,7 @@ const getAllDoctors = async (req, res) => {
   try {
     const queryParams = req.query;
     let doctors = await searchUser(userRole.DOCTOR, queryParams);
-    if (doctors.length === 0) {
+    if (doctors.length == 0) {
       return sendResponse(res, 404, "No doctors found with the given name");
     }
     return sendResponse(res, 200, "Doctors fetched successfully", doctors);
@@ -119,7 +119,6 @@ const updateDoctor = async (req, res) => {
     return sendResponse(res, 500, "Server error");
   }
 };
-
 const deleteDoctor = async (req, res) => {
   try {
     const { id } = req.params;

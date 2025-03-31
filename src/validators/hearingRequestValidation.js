@@ -15,7 +15,7 @@ const hearingRequestValidatorSchema = Joi.object({
 const hearingRequestUpdateValidatorSchema = Joi.object({
   status: Joi.string()
     .required()
-    .valid("approved", "rejected", "pending", "completed")
+    .valid("approved", "rejected", "completed")
     .default("pending"),
 });
 

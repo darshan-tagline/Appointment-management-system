@@ -28,7 +28,7 @@ const getAllMedicines = async (req, res) => {
     const queryParams = req.query;
     let medicines = await searchMedicine(queryParams);
 
-    if (medicines.length === 0) {
+    if (medicines.length == 0) {
       return sendResponse(res, 404, "No medicines found with the given name");
     }
     return sendResponse(res, 200, "Medicines fetched successfully", medicines);

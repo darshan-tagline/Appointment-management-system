@@ -45,6 +45,9 @@ const findAllHearings = async (query, pagination) => {
   };
 };
 
+const fetchAllHearings = async (id) => {
+  return Hearing.find({ doctorId: id });
+};
 const removeHearing = async (id) => {
   return Hearing.findByIdAndDelete(id);
 };
@@ -55,4 +58,5 @@ module.exports = {
   addNewHearing,
   findAllHearings,
   removeHearing,
+  fetchAllHearings,
 };

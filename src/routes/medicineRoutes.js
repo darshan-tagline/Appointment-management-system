@@ -11,17 +11,18 @@ const {
   updateMedicine,
   deleteMedicine,
 } = require("../controller/medicineController");
+const { idValidatorSchema } = require("../validators/commonValidation");
 
 const medicineRouter = express.Router();
 
 medicineRouter.post("/", validate(medicineValidatorSchema), addMedicine);
 medicineRouter.get("/", getAllMedicines);
-medicineRouter.get("/:id", getMedicineById);
+medicineRouter.get("/:id", validate(idValidatorSchema), getMedicineById);
 medicineRouter.put(
   "/:id",
-  validate(medicineUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(medicineUpdateValidatorSchema)),
   updateMedicine
 );
-medicineRouter.delete("/:id", deleteMedicine);
+medicineRouter.delete("/:id", validate(idValidatorSchema), deleteMedicine);
 
 module.exports = medicineRouter;

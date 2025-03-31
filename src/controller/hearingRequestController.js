@@ -83,8 +83,18 @@ const updateHearingStatus = async (req, res) => {
     const { status } = req.body;
 
     const hearingRequest = await findHearingRequest({ _id: id });
+
     if (!hearingRequest) {
       return sendResponse(res, 404, "Hearing request not found");
+    }
+    if (hearingRequest.status == "approved" && status == "approved") {
+      return sendResponse(res, 400, "Hearing request already approved");
+    }
+    if (hearingRequest.status == "rejected" && status == "rejected") {
+      return sendResponse(res, 400, "Hearing request already rejected");
+    }
+    if (hearingRequest.status == "completed" && status == "completed") {
+      return sendResponse(res, 400, "Hearing request already completed");
     }
     const updatedHearingRequest = await updateHearingRequest(id, { status });
 

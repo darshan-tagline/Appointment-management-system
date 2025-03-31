@@ -6,6 +6,7 @@ const {
   updateHearingData,
   findAllHearings,
   removeHearing,
+  fetchAllHearings,
 } = require("../service/hearingServices");
 const { createBill, findBill, updateBill } = require("../service/billServices");
 const { findMedicine } = require("../service/medicineServices");
@@ -43,6 +44,16 @@ const addHearing = async (req, res) => {
   }
 };
 
+const findAllhearing = async (req, res) => {
+  try {
+    const id = req.user._id;
+    const hearings = await fetchAllHearings(id);
+    return sendResponse(res, 200, "Hearings fetched successfully", hearings);
+  } catch (error) {
+    console.log("Error in get all hearings:>>>>>", error);
+    return sendResponse(res, 500, "Server error");
+  }
+};
 const getHearing = async (req, res) => {
   try {
     const { id } = req.params;
@@ -266,7 +277,7 @@ const getHearingById = async (req, res) => {
 const deleteHearing = async (req, res) => {
   try {
     const { id } = req.params;
-    const hearing = await removeHearing({ _id: id });    
+    const hearing = await removeHearing({ _id: id });
     if (!hearing) {
       return sendResponse(res, 404, "Hearing not found");
     }
@@ -283,5 +294,6 @@ module.exports = {
   updateHearing,
   getAllHearings,
   getHearingById,
+  findAllhearing,
   deleteHearing,
 };

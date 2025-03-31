@@ -23,7 +23,7 @@ const sendOTP = async (email) => {
     await sendEmail(
       patient.email,
       emailSubject.PATIENT,
-      emailText.PATIENT.replace("${otp}", otp)
+      emailText.PATIENT(otp)
     );
   } catch (error) {
     console.error("Error sending OTP:", error);

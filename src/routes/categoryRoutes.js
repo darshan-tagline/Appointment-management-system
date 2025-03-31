@@ -11,14 +11,15 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../controller/categoryController");
+const { idValidatorSchema } = require("../validators/commonValidation");
 const categoryRouter = express.Router();
 
 categoryRouter.post("/", validate(categoryValidatorSchema), addCategory);
 categoryRouter.get("/", getAllCategories);
-categoryRouter.get("/:id", getCategoryById);
+categoryRouter.get("/:id", validate(idValidatorSchema), getCategoryById);
 categoryRouter.put(
   "/:id",
-  validate(categoryUpdateValidatorSchema),
+  validate(idValidatorSchema.concat(categoryUpdateValidatorSchema)),
   updateCategory
 );
 categoryRouter.delete("/:id", deleteCategory);

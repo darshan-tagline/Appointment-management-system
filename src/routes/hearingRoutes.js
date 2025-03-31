@@ -7,6 +7,7 @@ const {
   getAllHearings,
   getHearingById,
   deleteHearing,
+  findAllhearing,
 } = require("../controller/hearingController");
 const {
   hearingUpdateValidatorSchema,
@@ -19,6 +20,7 @@ const hearingRouterForAdmin = express.Router();
 
 // doctor
 hearingRouter.post("/", validate(hearingValidatorSchema), addHearing);
+hearingRouter.get("/", findAllhearing);
 hearingRouter.get("/:id", validate(idValidatorSchema), getHearing);
 hearingRouter.put(
   "/:id",
