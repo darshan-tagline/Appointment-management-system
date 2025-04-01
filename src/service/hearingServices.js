@@ -32,7 +32,6 @@ const findAllHearings = async (query, pagination) => {
   const result = await Hearing.aggregate(paginatedQuery);
   const totalDocuments = result.length || 0;
   const totalPages = Math.ceil(totalDocuments / limit);
-  console.log(result);
 
   return {
     pagination: {
@@ -41,7 +40,7 @@ const findAllHearings = async (query, pagination) => {
       totalDocuments,
       totalPages,
     },
-    Hearings: result[0] || [],
+    Hearings: result || [],
   };
 };
 

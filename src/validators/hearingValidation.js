@@ -9,8 +9,8 @@ const hearingValidatorSchema = Joi.object({
     "string.min": "Description must be at least 3 characters long.",
   }),
   status: Joi.string()
-    .valid("resolved", "In Progress")
-    .default("In Progress")
+    .valid("resolved", "InProgress")
+    .default("InProgress")
     .messages({
       "string.valid": "Status must be either 'resolved' or 'In Progress'.",
     }),

@@ -46,7 +46,7 @@ const findAllAppinments = async (
       totalDocuments,
       totalPages,
     },
-    appointments: result[0] || [],
+    appointments: result || [],
   };
 };
 

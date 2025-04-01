@@ -29,7 +29,9 @@ const userSchema = new mongoose.Schema(
       ref: "Category",
     },
     isVerified: {
-      type: Boolean,
+      type: String,
+      enum: ["true", "false"],
+      default: "false",
     },
     otp: {
       type: String,

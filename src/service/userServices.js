@@ -35,6 +35,12 @@ const searchUser = async (role, data) => {
       },
     },
     {
+      $unwind: {
+        path: "$categoryDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $facet: {
         metadata: [{ $count: "totalDocuments" }],
         users: [{ $skip: skip }, { $limit: limit }],
@@ -58,6 +64,11 @@ const searchUser = async (role, data) => {
 
   const totalDocuments = result[0]?.totalDocuments || 0;
   const totalPages = Math.ceil(totalDocuments / limit);
+  result[0]?.users?.forEach((user) => {
+    if (user.role == userRole.PATIENT) {
+      delete user.categoryDetails;
+    }
+  });
 
   return {
     pagination: {

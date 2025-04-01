@@ -25,7 +25,7 @@ const findCase = async (data) => {
 
 const deleteCase = async (data) => {
   return Case.deleteOne(data);
-}
+};
 const findCases = async (query, pagination) => {
   const page = Number(pagination.page) || 1;
   const limit = Number(pagination.limit) || 10;
@@ -42,7 +42,7 @@ const findCases = async (query, pagination) => {
       totalDocuments,
       totalPages,
     },
-    Cases: result[0] || [],
+    Cases: result || [],
   };
 };
 
