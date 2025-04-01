@@ -14,7 +14,7 @@ const sendEmail = async (to, subject, textContent) => {
     });
 
     const mailOptions = {
-      from: "admin@admin.com",
+      from: "AMS - <applicationmanagementsystem129@gmail.com>",
       to: to,
       subject: subject,
       html: textContent,
