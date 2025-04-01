@@ -15,7 +15,7 @@ const login = async (req, res) => {
       return sendResponse(res, 401, "Invalid email or password");
     }
 
-    if (user.isVerified === false) {
+    if (user.isVerified == "false") {
       return sendResponse(
         res,
         401,
@@ -89,7 +89,7 @@ const validateOTP = async (req, res) => {
     await updateUser(
       { email },
       {
-        isVerified: true,
+        isVerified: "true",
         otp: null,
         otpExpires: null,
       }
@@ -145,7 +145,7 @@ const forgotPassword = async (req, res) => {
     await updateUser(
       { email },
       {
-        isVerified: false,
+        isVerified: "false",
       }
     );
     await sendOTP(patient.email);
@@ -159,7 +159,7 @@ const forgotPassword = async (req, res) => {
 const forgotPasswordVarifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const patient = await findUser({ email, isVerified: false });
+    const patient = await findUser({ email, isVerified: "false" });
     if (!patient) {
       return sendResponse(res, 404, "User not found.");
     }
@@ -173,7 +173,7 @@ const forgotPasswordVarifyOTP = async (req, res) => {
     await updateUser(
       { email },
       {
-        isVerified: true,
+        isVerified: "true",
         otp: null,
         otpExpires: null,
       }
@@ -192,7 +192,7 @@ const resetPassword = async (req, res) => {
     if (!patient) {
       return sendResponse(res, 404, "User not found.");
     }
-    if (patient.isVerified === false) {
+    if (patient.isVerified == "false") {
       return sendResponse(
         res,
         400,

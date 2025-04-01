@@ -198,7 +198,10 @@ const getAllHearings = async (req, res) => {
           },
         },
         {
-          $unwind: "$medicineDetails",
+          $unwind: {
+            path: "$medicineDetails",
+            preserveNullAndEmptyArrays: true,
+          },
         },
 
         {
@@ -210,7 +213,10 @@ const getAllHearings = async (req, res) => {
           },
         },
         {
-          $unwind: "$caseDetails",
+          $unwind: {
+            path: "$caseDetails",
+            preserveNullAndEmptyArrays: true,
+          },
         },
 
         {
@@ -222,7 +228,25 @@ const getAllHearings = async (req, res) => {
           },
         },
         {
-          $unwind: "$appointmentDetails",
+          $unwind: {
+            path: "$appointmentDetails",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "caseDetails.patientId",
+            foreignField: "_id",
+            as: "patientDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$patientDetails",
+            preserveNullAndEmptyArrays: true,
+          },
         },
 
         {
@@ -247,12 +271,20 @@ const getAllHearings = async (req, res) => {
               },
             },
             appointmentDetails: 1,
+            patientDetails: {
+              _id: "$patientDetails._id",
+              name: "$patientDetails.name",
+              email: "$patientDetails.email",
+              phone: "$patientDetails.phone",
+            },
           },
         },
       ],
       queryParams
     );
-    if (hearings.length == 0) return sendResponse(res, 204, "no hearing found");
+
+    if (hearings.length === 0)
+      return sendResponse(res, 204, "No hearings found");
     return sendResponse(res, 200, "All Hearings", hearings);
   } catch (error) {
     console.log("getAllHearings error:======>>", error);
