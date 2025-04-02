@@ -26,11 +26,6 @@ const searchMedicine = async (data) => {
 
   const result = await Medicine.aggregate([
     {
-      // $match: {
-      //   ...(data.name && { name: { $regex: data.name, $options: "i" } }),
-      //   ...(data.price && { price: Number(data.price) }),
-      // },
-
       $match: {
         ...(data.search && {
           $or: [
@@ -39,6 +34,9 @@ const searchMedicine = async (data) => {
           ],
         }),
       },
+    },
+    {
+      $sort: { createdAt: -1 },
     },
     {
       $facet: {

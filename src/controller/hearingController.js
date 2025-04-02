@@ -283,8 +283,6 @@ const getAllHearings = async (req, res) => {
       queryParams
     );
 
-    if (hearings.length === 0)
-      return sendResponse(res, 204, "No hearings found");
     return sendResponse(res, 200, "All Hearings", hearings);
   } catch (error) {
     console.log("getAllHearings error:======>>", error);

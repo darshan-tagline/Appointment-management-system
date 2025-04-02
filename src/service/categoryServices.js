@@ -33,6 +33,9 @@ const searchCategory = async (data) => {
       },
     },
     {
+      $sort: { createdAt: -1 },
+    },
+    {
       $facet: {
         metadata: [{ $count: "totalDocuments" }],
         categories: [{ $skip: skip }, { $limit: limit }],
