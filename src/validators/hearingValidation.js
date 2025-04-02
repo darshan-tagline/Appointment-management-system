@@ -43,10 +43,10 @@ const hearingValidatorSchema = Joi.object({
 const hearingUpdateValidatorSchema = Joi.object({
   status: Joi.string()
     .lowercase()
-    .valid("resolved", "in progress")
+    .valid("resolved", "inprogress")
     .required()
     .messages({
-      "string.valid": "Status must be either 'resolved' or 'in progress'.",
+      "string.valid": "Status must be either 'resolved' or 'inprogress'.",
     }),
   description: Joi.string().optional().messages({
     "string.base": "Description must be a string.",
