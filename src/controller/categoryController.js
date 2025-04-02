@@ -28,9 +28,6 @@ const getAllCategories = async (req, res) => {
   try {
     const queryParams = req.query;
     let categories = await searchCategory(queryParams);
-    if (categories.length === 0) {
-      return sendResponse(res, 404, "No categories found with the given name");
-    }
     return sendResponse(
       res,
       200,

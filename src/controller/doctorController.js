@@ -51,9 +51,6 @@ const getAllDoctors = async (req, res) => {
   try {
     const queryParams = req.query;
     let doctors = await searchUser(userRole.DOCTOR, queryParams);
-    if (doctors.length == 0) {
-      return sendResponse(res, 404, "No doctors found with the given name");
-    }
     return sendResponse(res, 200, "Doctors fetched successfully", doctors);
   } catch (error) {
     console.log("Error in get all doctors:>>>>", error);

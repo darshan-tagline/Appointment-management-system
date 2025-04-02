@@ -27,6 +27,9 @@ const searchUser = async (role, data) => {
       },
     },
     {
+      $sort: { createdAt: -1 },
+    },
+    {
       $lookup: {
         from: "categories",
         localField: "categoryId",
