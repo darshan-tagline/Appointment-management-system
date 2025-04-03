@@ -97,30 +97,27 @@ const updateAppointment = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+    const lowercaseStatus = status.toLowerCase();
 
     const appointment = await findAppointment({ _id: id });
     if (!appointment) {
       return sendResponse(res, 404, "Appointment not found");
     }
-
     const currentStatus = appointment[0]?.status;
-    if (currentStatus == "approved" && status == "approved") {
-      return sendResponse(res, 400, "Appointment is already approved");
+    if (currentStatus == lowercaseStatus) {
+      return sendResponse(
+        res,
+        400,
+        `Appointment is already ${lowercaseStatus}`
+      );
     }
-
-    if (currentStatus == "rejected" && status == "rejected") {
-      return sendResponse(res, 400, "Appointment is already rejected");
-    }
-
-    if (status == "rejected") {
+    if (lowercaseStatus == "rejected") {
       await deleteCase({ appointmentId: id });
-
-      await updateStatus(id, "rejected");
-
+      let appointment = await updateStatus(id, "rejected");
       return sendResponse(res, 200, "Appointment is rejected", appointment);
     }
 
-    if (status == "approved") {
+    if (lowercaseStatus == "approved") {
       const existingCase = await findCase({ appointmentId: id });
       if (existingCase) {
         return sendResponse(

@@ -72,7 +72,6 @@ const updateHearing = async (req, res) => {
   try {
     const { id } = req.params;
     const hearingbyId = await findHearing({ _id: id });
-
     if (!hearingbyId) {
       return sendResponse(res, 404, "Hearing not found");
     }
@@ -92,6 +91,7 @@ const updateHearing = async (req, res) => {
       }
     }
 
+    const lowercaseStatus = status.toLowerCase();
     const hearing = await updateHearingData(id, {
       status,
       description,
@@ -104,7 +104,7 @@ const updateHearing = async (req, res) => {
 
     const existingBill = await findBill({ hearingId: id });
 
-    if (status == "Resolved" || status == "resolved") {
+    if (lowercaseStatus == "resolved") {
       if (existingBill) {
         const isPrescriptionChanged =
           hearingbyId.prescription.length !== prescription.length ||
