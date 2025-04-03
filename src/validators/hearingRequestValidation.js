@@ -8,6 +8,7 @@ const hearingRequestValidatorSchema = Joi.object({
   }),
   reason: Joi.string().required().trim(),
   status: Joi.string()
+    .lowercase()
     .valid("approved", "rejected", "pending", "completed")
     .default("pending"),
 });
@@ -15,6 +16,7 @@ const hearingRequestValidatorSchema = Joi.object({
 const hearingRequestUpdateValidatorSchema = Joi.object({
   status: Joi.string()
     .required()
+    .lowercase()
     .valid("approved", "rejected", "completed")
     .default("pending"),
 });
