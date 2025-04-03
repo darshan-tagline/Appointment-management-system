@@ -113,9 +113,6 @@ const updateHearingStatus = async (req, res) => {
 const getAllHearingRequests = async (req, res) => {
   try {
     const data = await findAllHearingRequest();
-    if (!data) {
-      return sendResponse(res, 404, "Hearing not found");
-    }
     return sendResponse(
       res,
       200,

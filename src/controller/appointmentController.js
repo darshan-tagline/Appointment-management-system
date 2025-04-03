@@ -9,6 +9,7 @@ const { findCase, addNewCase, deleteCase } = require("../service/caseServices");
 const sendResponse = require("../utils/responseUtils");
 const { findBooking, findTimeSlot } = require("../service/appoinmentServices");
 const { findUser } = require("../service/userServices");
+const { userRole } = require("../utils/comman");
 
 const createAppointment = async (req, res) => {
   try {
@@ -16,6 +17,7 @@ const createAppointment = async (req, res) => {
     const patientId = req.user._id;
     const validDoctorId = await findUser({
       _id: doctorId,
+      role: userRole.DOCTOR,
     });
     if (!validDoctorId) {
       return sendResponse(res, 404, "Doctor not found");
@@ -101,7 +103,7 @@ const updateAppointment = async (req, res) => {
       return sendResponse(res, 404, "Appointment not found");
     }
 
-    const currentStatus = appointment[0].status;
+    const currentStatus = appointment[0]?.status;
     if (currentStatus == "approved" && status == "approved") {
       return sendResponse(res, 400, "Appointment is already approved");
     }
@@ -197,8 +199,6 @@ const getAllAppointment = async (req, res) => {
       ],
       queryParams
     );
-    if (appointments.length == 0)
-      return sendResponse(res, 204, "No appointments Found");
     return sendResponse(res, 200, "All appointments", appointments);
   } catch (error) {
     console.log("Error getting all appointments ==>>>", error);
