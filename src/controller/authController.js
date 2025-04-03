@@ -124,7 +124,7 @@ const resendOtp = async (req, res) => {
       return sendResponse(
         res,
         400,
-        "You can request OTP again after some time."
+        "You can request for OTP again after some time."
       );
     }
     await sendOTP(patient.email);
