@@ -51,4 +51,23 @@ const emailText = Object.freeze({
   `,
 });
 
-module.exports = { userRole, emailSubject, emailText };
+const status = Object.freeze({
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  INPROGRESS: "inprogress",
+  COMPLETED: "completed",
+  RESLVED: "resolved",
+});
+
+const collectionName = Object.freeze({
+  USER: "users",
+  MEDICINE: "medicines",
+  CATEGORY: "categorys",
+  CASE: "cases",
+  HEARING: "hearings",
+  HEARING_REQUEST: "hearingrequests",
+  APPOINTMENT: "appointments",
+  BILL: "bills",
+});
+module.exports = { userRole, emailSubject, emailText, status, collectionName };

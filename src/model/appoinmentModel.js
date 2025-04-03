@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { status } = require("../utils/comman");
 const appointmentSchema = new mongoose.Schema(
   {
     doctorId: {
@@ -14,7 +15,7 @@ const appointmentSchema = new mongoose.Schema(
     date: { type: Date, required: true },
     timeSlot: { type: String, required: true },
     symptoms: { type: String },
-    status: { type: String, default: "pending" },
+    status: { type: String, default: status.PENDING },
   },
   { versionKey: false, timestamps: true }
 );
