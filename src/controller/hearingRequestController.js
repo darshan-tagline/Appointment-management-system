@@ -81,20 +81,20 @@ const updateHearingStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+    let lowercaseStatus = status.toLowerCase();
 
     const hearingRequest = await findHearingRequest({ _id: id });
 
     if (!hearingRequest) {
       return sendResponse(res, 404, "Hearing request not found");
     }
-    if (hearingRequest.status == "approved" && status == "approved") {
-      return sendResponse(res, 400, "Hearing request already approved");
-    }
-    if (hearingRequest.status == "rejected" && status == "rejected") {
-      return sendResponse(res, 400, "Hearing request already rejected");
-    }
-    if (hearingRequest.status == "completed" && status == "completed") {
-      return sendResponse(res, 400, "Hearing request already completed");
+
+    if (hearingRequest.status == lowercaseStatus) {
+      return sendResponse(
+        res,
+        400,
+        `Hearing request already ${lowercaseStatus}`
+      );
     }
     const updatedHearingRequest = await updateHearingRequest(id, { status });
 
@@ -112,12 +112,16 @@ const updateHearingStatus = async (req, res) => {
 
 const getAllHearingRequests = async (req, res) => {
   try {
-    const data = await findAllHearingRequest();
+    const queryParams = req.query;
+    const result = await findAllHearingRequest(
+      [{ $sort: { createdAt: -1 } }],
+      queryParams
+    );
     return sendResponse(
       res,
       200,
       "Hearing Requests fetched successfully",
-      data
+      result
     );
   } catch (error) {
     console.log("Error in get all hearing requests:>>>>>", error);

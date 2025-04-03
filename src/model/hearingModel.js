@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { status } = require("../utils/comman");
 
 const hearingSchema = new mongoose.Schema(
   {
@@ -18,8 +19,9 @@ const hearingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Resolved", "InProgress"],
-      default: "InProgress",
+      lowercase: true,
+      enum: [status.RESOLVED, status.INPROGRESS],
+      default: status.INPROGRESS,
     },
     prescription: [
       {
