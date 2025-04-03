@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { userRole } = require("../utils/comman");
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "doctor", "patient"],
+      enum: [userRole.ADMIN, userRole.DOCTOR, userRole.PATIENT],
       required: true,
       lowercase: true,
     },

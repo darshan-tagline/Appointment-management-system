@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { status } = require("../utils/comman");
 
 const hearingRequestSchema = new mongoose.Schema(
   {
@@ -19,8 +20,14 @@ const hearingRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["approved", "rejected", "pending", "completed"],
-      default: "pending",
+      lowercase: true,
+      enum: [
+        status.APPROVED,
+        status.REJECTED,
+        status.PENDING,
+        status.COMPLETED,
+      ],
+      default: status.PENDING,
       required: true,
     },
   },
