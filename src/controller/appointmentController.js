@@ -170,10 +170,13 @@ const getAllAppointment = async (req, res) => {
           },
         },
         {
-          $unwind: "$patient",
+          $unwind: {
+            path: "$patient",
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
-          $unwind: "$doctor",
+          $unwind: { path: "$doctor", preserveNullAndEmptyArrays: true },
         },
         {
           $project: {

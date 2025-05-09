@@ -32,7 +32,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("*", (req, _res, next) => {
-  console.log("request url :>> ", req.originalUrl);
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const period = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+
+  const time = `${hours}:${minutes} ${period}`;
+  console.log("Request URL :>> ", req.originalUrl, "Time :>> ", time);
   next();
 });
 app.use("/api", router);

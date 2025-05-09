@@ -22,7 +22,7 @@ const findAllHearingRequest = async (query, pagination) => {
   const skip = (page - 1) * limit;
   const paginatedQuery = [...query, { $skip: skip }, { $limit: limit }];
   const result = await HearingRequest.aggregate(paginatedQuery);
-  const totalDocuments = result.length || 0;
+  const totalDocuments = await HearingRequest.countDocuments();
   const totalPages = Math.ceil(totalDocuments / limit);
   return {
     pagination: {

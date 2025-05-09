@@ -37,7 +37,7 @@ const findAllAppinments = async (
   const skip = (page - 1) * limit;
   const paginatedQuery = [...query, { $skip: skip }, { $limit: limit }];
   const result = await Appointment.aggregate(paginatedQuery);
-  const totalDocuments = result.length || 0;
+  const totalDocuments = await Appointment.countDocuments();
   const totalPages = Math.ceil(totalDocuments / limit);
   return {
     pagination: {
